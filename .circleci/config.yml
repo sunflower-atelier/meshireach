@@ -28,7 +28,8 @@ jobs:
       - run:
           name: get
           command: dep ensure
+          working_directory: /go/src/github.com/sunflower-atelier/meshireach/src/api
       - run:
           name: test
-          command: go test
+          command: ls
 
