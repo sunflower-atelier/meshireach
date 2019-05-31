@@ -1,0 +1,15 @@
+version: '3'
+services:
+  api:
+    build: .
+    command: go run main.go
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src/api:/go/src/api
+      - vendor:/go/src/api/vendor
+    environment:
+      GOPATH: /go
+
+volumes:
+  vendor:
