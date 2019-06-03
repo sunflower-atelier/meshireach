@@ -4,6 +4,10 @@ executors:
   default:
     docker:
       - image: circleci/golang:1.12.2
+      - image: circleci/mysql:latest
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DB: meshireach_test
     working_directory: /go/src/github.com/sunflower-atelier/meshireach
     environment:
       GO111MODULE: "on"

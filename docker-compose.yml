@@ -1,7 +1,20 @@
 version: '3'
 services:
+  db:
+    image: mysql:8.0.16
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_DATABASE: meshireach
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    command: mysqld
   api:
     build: .
+    depends_on:
+      - db
     ports:
       - 3000:3000
     volumes:
@@ -9,3 +22,7 @@ services:
     environment:
       GO111MODULE: "on"
       CGO_ENABLED: 0
+
+volumes:
+  mysql_data:
+    driver: "local"
