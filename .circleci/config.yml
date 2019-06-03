@@ -1,35 +1,23 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+executors:
+  default: circleci/golang:1.12
+  working_directory: /go/src/github.com/sunflower-atelier/meshireach
+  environment:
+    - GO111MODULES: "on"
 jobs:
-  build:
-    docker:
-      # specify the version
-      - image: circleci/golang:1.9
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/sunflower-atelier/meshireach
+  setup:
+    executor:
+      name: default
     steps:
       - checkout
-
-      # specify any bash command here prefixed with `run: `
       - run:
-          name: add dep
-          command: go get -u github.com/golang/dep/cmd/dep
+        name: Vendoring
+        command: go mod download
+  test:
+    executor:
+      name: default
+    steps:
       - run:
-          name: get
-          command: dep ensure
-          working_directory: /go/src/github.com/sunflower-atelier/meshireach/src/api
-      - run:
-          name: test
-          command: ls
+        name: Testing main.go
+        command: go test
 
