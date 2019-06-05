@@ -36,7 +36,7 @@ jobs:
       - checkout
       - run:
           name: Check format
-          command: go fmt
+          command: (! gofmt -s -d . | grep '^')
       - run:
           name: Testing main.go
           command: go test
