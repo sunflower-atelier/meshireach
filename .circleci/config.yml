@@ -1,0 +1,53 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: circleci/golang:1.12.2
+      - image: circleci/mysql:latest
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DB: meshireach_test
+    working_directory: /go/src/github.com/sunflower-atelier/meshireach
+    environment:
+      GO111MODULE: "on"
+
+jobs:
+  setup:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore go modules cache
+          key: modules-{{ .Branch }}-{{ checksum "go.mod" }}
+      - run:
+          name: Vendoring
+          command: go mod download
+      - save_cache:
+          name: Save go modules cache
+          key: modules-{{ .Branch }}-{{ checksum "go.mod" }}
+          paths:
+            - /go/pkg/mod/cache
+  test:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - run:
+          name: Check format
+          command: (! gofmt -s -d . | grep '^')
+      - run:
+          name: Testing main.go
+          command: go test
+      - run:
+          name: Testing ./test/some_tests
+          command: go test -run 'test/'
+
+workflows:
+  testing:
+    jobs:
+      - setup
+      - test:
+          requires:
+            - setup
