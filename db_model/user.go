@@ -6,8 +6,8 @@ type UserID string
 
 type User struct {
 	gorm.Model
-	UserID UserID
+	UserID   UserID
 	SearchID string
-	Name string
-	Message string
+	Name     string
+	Message  string
 }
