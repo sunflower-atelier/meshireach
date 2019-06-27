@@ -1,31 +1,20 @@
 package main
 
 import (
+	"meshireach/db_model"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// Product is just tmp
-type Product struct {
-	gorm.Model
-	Code  string
-	Price uint
-}
-
-// Profile represents someone's information
-type Profile struct {
-	Name    string `json:"name"`
-	Message string `json:"message"`
-}
-
 func editProfile(c *gin.Context) {
-	var profile Profile
-	c.BindJSON(&profile)
+	var user db_model.User
+	c.BindJSON(&user)
 	c.JSON(200, gin.H{
 		"status":  "success",
-		"name":    profile.Name,
-		"message": profile.Message,
+		"name":    user.Name,
+		"message": user.Message,
 	})
 }
 
@@ -36,7 +25,10 @@ func main() {
 	}
 	defer db.Close()
 
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&db_model.User{})
+	db.AutoMigrate(&db_model.Friend_Relation{})
+	db.AutoMigrate(&db_model.Event{})
+	db.AutoMigrate(&db_model.Participants{})
 
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
