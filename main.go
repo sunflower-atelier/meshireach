@@ -6,10 +6,27 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+// Product is just tmp
 type Product struct {
 	gorm.Model
 	Code  string
 	Price uint
+}
+
+// Profile represents someone's information
+type Profile struct {
+	Name    string `json:"name"`
+	Message string `json:"message"`
+}
+
+func editProfile(c *gin.Context) {
+	var profile Profile
+	c.BindJSON(&profile)
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"name":    profile.Name,
+		"message": profile.Message,
+	})
 }
 
 func main() {
@@ -27,5 +44,6 @@ func main() {
 			"message": "pong",
 		})
 	})
+	r.POST("/profile", editProfile)
 	r.Run(":3000")
 }
