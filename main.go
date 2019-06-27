@@ -8,14 +8,16 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-func editProfile(c *gin.Context) {
-	var user db_model.User
-	c.BindJSON(&user)
-	c.JSON(200, gin.H{
-		"status":  "success",
-		"name":    user.Name,
-		"message": user.Message,
-	})
+func editProfile(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user db_model.User
+		c.BindJSON(&user)
+		c.JSON(200, gin.H{
+			"status":  "success",
+			"name":    user.Name,
+			"message": user.Message,
+		})
+	}
 }
 
 func main() {
@@ -36,6 +38,6 @@ func main() {
 			"message": "pong",
 		})
 	})
-	r.POST("/profile", editProfile)
+	r.POST("/profile", editProfile(db))
 	r.Run(":3000")
 }
