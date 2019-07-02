@@ -38,6 +38,9 @@ jobs:
           name: Check format
           command: (! gofmt -s -d . | grep '^')
       - run:
+          name: Lint
+          command: go lint
+      - run:
           name: Testing main.go
           command: go test
       - run:
