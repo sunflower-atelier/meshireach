@@ -33,7 +33,11 @@ func initRoute(db *gorm.DB) *gin.Engine {
 	r.GET("/private", middleware.FirebaseAuth(), func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "認証成功！")
 	})
-	r.POST("/profile", api.EditProfile(db))
+
+	// profile
+	// TODO: UserIDが既に登録されているかを確認するmiddlewareを仕込む
+	r.POST("/profile/create", api.CreateProfile(db))
+	r.POST("/profile/update", api.EditProfile(db))
 
 	return r
 }

@@ -15,7 +15,7 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 
 		// 更新前の情報を取得
 		// FIXME: UserIDはheaderのtokenから取得する
-		var beforeUser = User{user.UserID}
+		var beforeUser = db_model.User{user.UserID}
 		db.First(&beforeUser)
 
 		// 更新
