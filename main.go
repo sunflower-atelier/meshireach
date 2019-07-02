@@ -1,11 +1,10 @@
 package main
 
 import (
-	"net/http"
-
 	"meshireach/api"
-	"meshireach/db_model"
+	"meshireach/db/model"
 	"meshireach/middleware"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -18,10 +17,10 @@ func initDB() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&db_model.User{})
-	db.AutoMigrate(&db_model.Friend_Relation{})
-	db.AutoMigrate(&db_model.Event{})
-	db.AutoMigrate(&db_model.Participants{})
+	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Friend_Relation{})
+	db.AutoMigrate(&model.Event{})
+	db.AutoMigrate(&model.Participants{})
 
 	return db
 }

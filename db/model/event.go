@@ -1,14 +1,16 @@
-package db_model
+package model
 
 import (
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
 type EventID int
 
 type Event struct {
-	EventID  EventID `gorm:"primary_key"`
-	Owner    UserID
+	gorm.Model
+	EventID  EventID
+	Owner    int
 	Title    string
 	Deadline time.Time
 }
