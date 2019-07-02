@@ -39,7 +39,7 @@ jobs:
           command: (! gofmt -s -d . | grep '^')
       - run:
           name: Lint
-          command: go lint
+          command: golint
       - run:
           name: Testing main.go
           command: go test
