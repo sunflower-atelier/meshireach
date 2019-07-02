@@ -29,6 +29,9 @@ jobs:
           key: modules-{{ .Branch }}-{{ checksum "go.mod" }}
           paths:
             - /go/pkg/mod/cache
+      - run:
+          name: Install golint
+          command: go get golang.org/x/lint/golint
   test:
     executor:
       name: default
