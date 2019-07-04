@@ -30,14 +30,18 @@ func initRoute(db *gorm.DB) *gin.Engine {
 	r.Use(middleware.AutoOptions())
 
 	r.GET("/ping", api.Ping())
-	r.GET("/private", middleware.FirebaseAuth(), func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "認証成功！")
-	})
 
-	// profile
-	// TODO: UserIDが既に登録されているかを確認するmiddlewareを仕込む
-	r.POST("/profile/create", api.CreateProfile(db))
-	r.POST("/profile/update", api.EditProfile(db))
+	authedGroup := r.Group("/")
+	authedGroup.Use(middleware.FirebaseAuth())
+	{
+		r.GET("/private", middleware.FirebaseAuth(), func(ctx *gin.Context) {
+			ctx.String(http.StatusOK, "認証成功！")
+		})
+
+		// profile
+		r.POST("/profiles", api.CreateProfile(db))
+		r.PUT("/profiles", api.EditProfile(db))
+	}
 
 	return r
 }
