@@ -41,7 +41,7 @@ func FirebaseAuth() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Printf("Verified ID token: %v\n", token)
+		// fmt.Printf("Verified ID token: %v\n", token)
 
 		ctx.Set("FirebaseID", token.UID)
 
