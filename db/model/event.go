@@ -8,7 +8,6 @@ import (
 
 type Event struct {
 	gorm.Model
-	EventID  int
 	Owner    int
 	Title    string
 	Deadline time.Time
