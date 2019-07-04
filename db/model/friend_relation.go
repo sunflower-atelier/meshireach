@@ -4,6 +4,6 @@ import "github.com/jinzhu/gorm"
 
 type Friend_Relation struct {
 	gorm.Model
-	From int
-	To   int
+	From uint
+	To   uint
 }
