@@ -1,0 +1,96 @@
+swagger: "2.0"
+info:
+  description: "メシリーチサーバーサイドのAPIドキュメントです．"
+  version: "0.0.1"
+  title: "Meshireach"
+  termsOfService: ""
+host: "localhost:3000"
+basePath: "/"
+
+tags:
+- name: "profile"
+  description: "ユーザーのプロフィール"
+
+schemes:
+- "https"
+- "http"
+
+paths:
+  /profiles:
+    post:
+      tags:
+      - "profile"
+      summary: "プロフィールを追加"
+      description: ""
+      operationId: "createProfile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "追加するユーザーの情報"
+        required: true
+        schema:
+          $ref: "#/definitions/Profile"
+      responses:
+        201:
+          description: "Created"
+    put:
+      tags:
+      - "profile"
+      summary: "プロフィールを編集"
+      description: ""
+      operationId: "updateProfile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "編集するユーザーの情報"
+        required: true
+        schema:
+          $ref: "#/definitions/Profile"
+      responses:
+        204:
+          description: "Not Content"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: "success"
+
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+
+definitions:
+  Profile:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      UserID:
+        type: "string"
+        format: "string"
+        example: "gahoehjqorijo1039u4i1nekfdj1"
+      SearchID:
+        type: "string"
+        format: "string"
+        description: "ユーザーが使うID"
+        example: "meshimeshi"
+      Name:
+        type: "string"
+        example: "群青 ひまわり"
+      Message:
+        type: "string"
+        description: "ひとこと"
+        example: "よろしく"
