@@ -1,9 +1,9 @@
-package db_model
+package model
 
 import "github.com/jinzhu/gorm"
 
 type Friend_Relation struct {
 	gorm.Model
-	From UserID
-	To   UserID
+	From uint
+	To   uint
 }

@@ -1,9 +1,9 @@
-package db_model
+package model
 
 import "github.com/jinzhu/gorm"
 
 type Participants struct {
 	gorm.Model
-	Event EventID
-	User  UserID
+	Event uint
+	User  uint
 }
