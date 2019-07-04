@@ -1,7 +1,7 @@
 package api
 
 import (
-	"meshireach/db_model"
+	"meshireach/db/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -10,12 +10,12 @@ import (
 // EditProfile is called when edit user information
 func EditProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var user db_model.User
+		var user model.User
 		c.BindJSON(&user)
 
 		// 更新前の情報を取得
-		// FIXME: UserIDはheaderのtokenから取得する
-		var beforeUser = db_model.User{UserID: user.UserID}
+		firebaseID, _ := c.Get("FirebaseID")
+		var beforeUser = model.User{FirebaseID: firebaseID.(string)}
 		db.First(&beforeUser)
 
 		// 更新
