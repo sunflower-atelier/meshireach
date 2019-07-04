@@ -16,7 +16,7 @@ schemes:
 - "http"
 
 paths:
-  /profile/create:
+  /profiles:
     post:
       tags:
       - "profile"
@@ -35,10 +35,9 @@ paths:
         schema:
           $ref: "#/definitions/Profile"
       responses:
-        200:
-          description: "OK"
-  /profile/update:
-    post:
+        201:
+          description: "Created"
+    put:
       tags:
       - "profile"
       summary: "プロフィールを編集"
@@ -56,8 +55,8 @@ paths:
         schema:
           $ref: "#/definitions/Profile"
       responses:
-        200:
-          description: "OK"
+        204:
+          description: "Not Content"
           schema:
             title: hoge
             type: object
@@ -65,12 +64,6 @@ paths:
               status:
                 type: string
                 example: "success"
-              searchID:
-                type: string
-              name:
-                type: string
-              message:
-                type: string
 
 securityDefinitions:
   api_key:
