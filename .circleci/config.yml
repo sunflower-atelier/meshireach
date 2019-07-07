@@ -33,17 +33,12 @@ jobs:
           name: Install golint
           command: go get -u golang.org/x/lint/golint
       - run: which golint
-  test:
-    executor:
-      name: default
-    steps:
-      - checkout
       - run:
           name: Check format
           command: (! gofmt -s -d . | grep '^')
       - run:
           name: Lint
-          command: /go/bin/golint main.go
+          command: golint main.go
       - run:
           name: Testing main.go
           command: go test
@@ -55,6 +50,4 @@ workflows:
   testing:
     jobs:
       - setup
-      - test:
-          requires:
-            - setup
+
