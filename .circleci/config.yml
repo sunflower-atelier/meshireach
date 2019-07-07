@@ -32,6 +32,7 @@ jobs:
       - run:
           name: Install golint
           command: go get -u golang.org/x/lint/golint
+      - run: which golint
   test:
     executor:
       name: default
