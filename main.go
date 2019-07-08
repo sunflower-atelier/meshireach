@@ -34,7 +34,7 @@ func initRoute(db *gorm.DB) *gin.Engine {
 	authedGroup := r.Group("/")
 	authedGroup.Use(middleware.FirebaseAuth())
 	{
-		r.GET("/private", middleware.FirebaseAuth(), func(ctx *gin.Context) {
+		r.GET("/private", func(ctx *gin.Context) {
 			ctx.String(http.StatusOK, "認証成功！")
 		})
 
