@@ -12,9 +12,9 @@ import (
 func CheckProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user model.User
-		uid, _ := c.Get("UserID")
-		db.Where("user_id = ? ", uid).First(&user)
-		if user.ID == uid {
+		firebaseid, _ := c.Get("FirebaseID")
+		db.Where("firebase_id = ? ", firebaseid).First(&user)
+		if user.FirebaseID == firebaseid {
 			c.JSON(http.StatusOK, gin.H{
 				"status":     "Exist",
 				"ID":         user.ID,
