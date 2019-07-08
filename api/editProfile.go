@@ -14,18 +14,23 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 		c.BindJSON(&user)
 
 		// 更新前の情報を取得
-		firebaseID, _ := c.Get("FirebaseID")
-		var beforeUser = model.User{FirebaseID: firebaseID.(string)}
-		db.First(&beforeUser)
+		if firebaseID, exists := c.Get("FirebaseID"); exists {
+			var beforeUser = model.User{FirebaseID: firebaseID.(string)}
+			db.First(&beforeUser)
 
-		// 更新
-		db.Model(&beforeUser).Updates(user)
+			// 更新
+			db.Model(&beforeUser).Updates(user)
 
-		c.JSON(200, gin.H{
-			"status":   "success",
-			"searchID": user.SearchID,
-			"name":     user.Name,
-			"message":  user.Message,
-		})
+			c.JSON(200, gin.H{
+				"status":   "success",
+				"searchID": user.SearchID,
+				"name":     user.Name,
+				"message":  user.Message,
+			})
+		} else {
+			c.JSON(400, gin.H{
+				"status": "fail",
+			})
+		}
 	}
 }

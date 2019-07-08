@@ -12,16 +12,21 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user model.User
 		c.BindJSON(&user)
-		firebaseID, _ := c.Get("FirebaseID")
-		user.FirebaseID = firebaseID.(string)
+		if firebaseID, exists := c.Get("FirebaseID"); exists {
+			user.FirebaseID = firebaseID.(string)
+			db.Create(user)
 
-		db.Create(user)
+			c.JSON(200, gin.H{
+				"status":   "success",
+				"searchID": user.SearchID,
+				"name":     user.Name,
+				"message":  user.Message,
+			})
+		} else {
+			c.JSON(400, gin.H{
+				"status": "fail",
+			})
+		}
 
-		c.JSON(200, gin.H{
-			"status":   "success",
-			"searchID": user.SearchID,
-			"name":     user.Name,
-			"message":  user.Message,
-		})
 	}
 }
