@@ -34,6 +34,8 @@ func initRoute(db *gorm.DB) *gin.Engine {
 		ctx.String(http.StatusOK, "認証成功！")
 	})
 
+	r.GET("/checkprofile", api.CheckProfile(db))
+
 	return r
 }
 
