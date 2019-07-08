@@ -25,12 +25,7 @@ func CheckProfile(db *gorm.DB) gin.HandlerFunc {
 			})
 		} else {
 			c.JSON(http.StatusOK, gin.H{
-				"status":     "NotExist",
-				"ID":         user.ID,
-				"FirebaseID": user.FirebaseID,
-				"SearchID":   user.SearchID,
-				"Name":       user.Name,
-				"Message":    user.Message,
+				"status": "NotExist",
 			})
 		}
 	}
