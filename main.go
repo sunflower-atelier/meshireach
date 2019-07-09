@@ -38,7 +38,7 @@ func initRoute(db *gorm.DB) *gin.Engine {
 		})
 
 		// profile
-		authedGroup.GET("/ckeckprofile", api.CheckProfile(db))
+		authedGroup.GET("/profiles", api.CheckProfile(db))
 	}
 
 	return r
