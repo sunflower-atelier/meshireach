@@ -2,7 +2,6 @@ package api
 
 import (
 	"meshireach/db/model"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -14,7 +13,7 @@ func CheckProfile(db *gorm.DB) gin.HandlerFunc {
 		var user model.User
 		firebaseid := c.MustGet("FirebaseID")
 		if db.Where("firebase_id = ? ", firebaseid).First(&user).RecordNotFound() == false {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(200, gin.H{
 				"status":     "Exist",
 				"ID":         user.ID,
 				"FirebaseID": user.FirebaseID,
