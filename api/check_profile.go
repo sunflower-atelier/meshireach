@@ -16,7 +16,7 @@ func CheckProfile(db *gorm.DB) gin.HandlerFunc {
 		if db.Where("firebase_id = ? ", firebaseid).First(&user).RecordNotFound() == false {
 			c.JSON(http.StatusOK, gin.H{
 				"status":   "Exist",
-				"searchid": user.SearchID,
+				"searchID": user.SearchID,
 				"name":     user.Name,
 				"message":  user.Message,
 			})
