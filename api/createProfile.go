@@ -9,15 +9,35 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+func firstCreate(db *gorm.DB, firebaseID string) bool {
+	search := model.User{}
+	count := 0
+
+	db.Where("firebase_id = ?", firebaseID).Find(&search).Count(&count)
+	if count != 0 {
+		return false
+	}
+	return true
+}
+
 // CreateProfile is called when create user information
 func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := model.User{}
 		c.BindJSON(&user)
 
+		user.FirebaseID = c.MustGet("FirebaseID").(string)
+
+		// 一度profileをcreateしていたらerror
+		if !firstCreate(db, user.FirebaseID) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "fail",
+				"error":  "This user has already created his/her profile.",
+			})
+			return
+		}
+
 		if uniqueSearchID(db, user.SearchID) {
-			firebaseID := c.MustGet("FirebaseID")
-			user.FirebaseID = firebaseID.(string)
 			db.Create(&user)
 
 			c.JSON(http.StatusOK, gin.H{
