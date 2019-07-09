@@ -12,9 +12,8 @@ import (
 func CheckProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user model.User
-		firebaseid, _ := c.Get("FirebaseID")
-		db.Where("firebase_id = ? ", firebaseid).First(&user)
-		if user.FirebaseID == firebaseid {
+		firebaseid := c.MustGet("FirebaseID")
+		if db.Where("firebase_id = ? ", firebaseid).First(&user).RecordNotFound() == true {
 			c.JSON(http.StatusOK, gin.H{
 				"status":     "Exist",
 				"ID":         user.ID,
@@ -24,7 +23,7 @@ func CheckProfile(db *gorm.DB) gin.HandlerFunc {
 				"Message":    user.Message,
 			})
 		} else {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(404, gin.H{
 				"status": "NotExist",
 			})
 		}

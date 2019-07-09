@@ -30,11 +30,16 @@ func initRoute(db *gorm.DB) *gin.Engine {
 	r.Use(middleware.AutoOptions())
 
 	r.GET("/ping", api.Ping())
-	r.GET("/private", middleware.FirebaseAuth(), func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "認証成功！")
-	})
+	authedGroup := r.Group("/")
+	authedGroup.Use(middleware.FirebaseAuth())
+	{
+		authedGroup.GET("/private", func(ctx *gin.Context) {
+			ctx.String(http.StatusOK, "認証成功！")
+		})
 
-	r.GET("/checkprofile", api.CheckProfile(db))
+		// profile
+		authedGroup.GET("/ckeckprofile", api.CheckProfile(db))
+	}
 
 	return r
 }
