@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"meshireach/db/model"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -13,21 +14,24 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := model.User{}
 		c.BindJSON(&user)
-		if firebaseID, exists := c.Get("FirebaseID"); exists {
+
+		if uniqueSearchID(db, user.SearchID) {
+			firebaseID := c.MustGet("FirebaseID")
 			user.FirebaseID = firebaseID.(string)
 			db.Create(&user)
 
-			c.JSON(200, gin.H{
+			c.JSON(http.StatusOK, gin.H{
 				"status":   "success",
 				"searchID": user.SearchID,
 				"name":     user.Name,
 				"message":  user.Message,
 			})
 		} else {
-			fmt.Printf("FirebaseID not found\n")
+			fmt.Printf("SearchID is not unique\n")
 
-			c.JSON(400, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "fail",
+				"error":  "search id is not unique.",
 			})
 		}
 
