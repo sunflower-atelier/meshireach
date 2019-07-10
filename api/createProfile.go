@@ -51,7 +51,7 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "fail",
-				"error":  "search id is not unique.",
+				"error":  "Search ID is not unique.",
 			})
 		}
 
