@@ -33,10 +33,49 @@ paths:
         description: "追加するユーザーの情報"
         required: true
         schema:
-          $ref: "#/definitions/Profile"
+            title: success
+            type: object
+            properties:
+              searchID:
+                type: string
+                example: "meshi"
+              name:
+                type: string
+                example: "meshi reach"
+              message:
+                type: string
+                example: "yoro"
       responses:
         201:
           description: "Created"
+          schema:
+            title: success
+            type: object
+            properties:
+              status:
+                type: string
+                example: "success"
+              searchID:
+                type: string
+                example: "meshi"
+              name:
+                type: string
+                example: "meshi reach"
+              message:
+                type: string
+                example: "yoro"
+        400:
+          description: "Bad Request"
+          schema:
+            title: fail
+            type: object
+            properties:
+              status:
+                type: string
+                example: "fail"
+              error:
+                type: string
+                example: "Search ID is not unique."
     put:
       tags:
       - "profile"
@@ -53,18 +92,50 @@ paths:
         description: "編集するユーザーの情報"
         required: true
         schema:
-          $ref: "#/definitions/Profile"
+            title: success
+            type: object
+            properties:
+              searchID:
+                type: string
+                example: "meshi"
+              name:
+                type: string
+                example: "meshi reach"
+              message:
+                type: string
+                example: "yoro"
       responses:
-        204:
-          description: "Not Content"
+        200:
+          description: "OK"
           schema:
-            title: hoge
+            title: success
             type: object
             properties:
               status:
                 type: string
                 example: "success"
-
+              searchID:
+                type: string
+                example: "meshimeshi"
+              name:
+                type: string
+                example: "meshi reach"
+              message:
+                type: string
+                example: "yoro"
+        400:
+          description: "Bad Request"
+          schema:
+            title: fail
+            type: object
+            properties:
+              status:
+                type: string
+                example: "fail"
+              error:
+                type: string
+                example: "Search ID is not unique."
+                
 securityDefinitions:
   api_key:
     type: "apiKey"
@@ -78,7 +149,7 @@ definitions:
     - "name"
     - "photoUrls"
     properties:
-      UserID:
+      FirebaseID:
         type: "string"
         format: "string"
         example: "gahoehjqorijo1039u4i1nekfdj1"
