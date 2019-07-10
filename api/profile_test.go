@@ -83,3 +83,32 @@ func TestCreateProfile(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.JSONEq(t, json, w.Body.String())
 }
+
+func TestEditProfile(t *testing.T) {
+	// mock db
+	db, _, err := getDBMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	// router
+	r := initRoute(db)
+
+	// request
+	w := httptest.NewRecorder()
+	searchID := "meshiii"
+	name := "meshi reach"
+	message := "yoro"
+	jsonStr := `{"searchID":"` + searchID + `","name":"` + name + `","message":"` + message + `"}`
+	req, _ := http.NewRequest("PUT", "/profiles", bytes.NewBuffer([]byte(jsonStr)))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	// expected result
+	json := `{"status":"success","searchID":"` + searchID + `","name":"` + name + `","message":"` + message + `"}`
+
+	// assertion
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, json, w.Body.String())
+}
