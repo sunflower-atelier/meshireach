@@ -44,6 +44,7 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "fail",
+				"error":  "Search ID is not unique.",
 			})
 		}
 	}

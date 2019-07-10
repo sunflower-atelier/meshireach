@@ -40,7 +40,7 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 		if uniqueSearchID(db, user.SearchID) {
 			db.Create(&user)
 
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusCreated, gin.H{
 				"status":   "success",
 				"searchID": user.SearchID,
 				"name":     user.Name,
