@@ -31,7 +31,7 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 		// 一度profileをcreateしていたらerror
 		if !firstCreate(db, user.FirebaseID) {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"status": "fail",
+				"status": "failure",
 				"error":  "This user has already created his/her profile.",
 			})
 			return
@@ -50,7 +50,7 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 			fmt.Printf("SearchID is not unique\n")
 
 			c.JSON(http.StatusBadRequest, gin.H{
-				"status": "fail",
+				"status": "failure",
 				"error":  "Search ID is not unique.",
 			})
 		}

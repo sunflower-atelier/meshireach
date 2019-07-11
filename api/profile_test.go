@@ -55,7 +55,7 @@ func TestPong(t *testing.T) {
 	assert.Equal(t, json, w.Body.String())
 }
 
-func TestCreateProfile(t *testing.T) {
+func TestCreateProfileSuccess(t *testing.T) {
 	// mock db
 	db, _, err := getDBMock()
 	if err != nil {
@@ -81,6 +81,62 @@ func TestCreateProfile(t *testing.T) {
 
 	// assertion
 	assert.Equal(t, http.StatusCreated, w.Code)
+	assert.JSONEq(t, json, w.Body.String())
+}
+
+func TestCreateProfileFailure(t *testing.T) {
+	t.Skip("skip failure test")
+
+	// mock db
+	db, _, err := getDBMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	// router
+	r := initRoute(db)
+
+	// original data
+	searchID := "meshi"
+	name := "meshi reach"
+	message := "yoro"
+	// original := model.User{}
+	// original.FirebaseID = "dummy"
+	// original.SearchID = searchID
+	// original.Name = name
+	// original.Message = message
+
+	/* ここでmock dbに書き込まれない */
+	// db.Create(&original)
+
+	/* sqlmockのexpect使ってもできない */
+	// rows := sqlmock.NewRows([]string{"id", "created_at", "updated_at", "deleted_at", "firebase_id", "search_id", "name", "message"}).AddRow(1, "0000-00-00", "0000-00-00", "0000-00-00", "dummy", searchID, name, message)
+	//
+	// mock.ExpectQuery(regexp.QuoteMeta(
+	// 	`SELECT * FROM "users" ORDER BY "id" LIMIT 1`,
+	// )).WillReturnRows(rows)
+
+	// mock.ExpectQuery("^SELECT * FROM users ORDER BY \"id\" LIMIT 1$").WillReturnRows(rows)
+
+	/* dbに書き込まれているかのチェック */
+	// search := model.User{}
+	// db.First(&search)
+	// // db.Where("name = ?", name).Find(&search).Count(&count)
+	// fmt.Printf("id=%v\n", search.ID)
+
+	// request
+	w := httptest.NewRecorder()
+	jsonStr := `{"searchID":"` + searchID + `","name":"` + name + `","message":"` + message + `"}`
+	req, _ := http.NewRequest("POST", "/profiles", bytes.NewBuffer([]byte(jsonStr)))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	// expected result
+	json := `{"status":"failure","error":"This user has already created his/her profile."}`
+
+	// assertion
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.JSONEq(t, json, w.Body.String())
 }
 
