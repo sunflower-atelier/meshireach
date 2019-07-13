@@ -17,6 +17,44 @@ schemes:
 
 paths:
   /profiles:
+    get:
+      tags:
+      - "profile"
+      summary: "プロフィールが存在するか確認"
+      description: ""
+      operationId: "checkProfile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Exist"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: Exist
+              searchID:
+                type: string
+                example: (SearchID)
+              name:
+                type: string
+                example: (Name)
+              message:
+                type: string
+                example: (Message)
+        404:
+          description: "NotExist"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: NotExist
     post:
       tags:
       - "profile"
