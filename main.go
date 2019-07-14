@@ -30,7 +30,8 @@ func initRoute(db *gorm.DB) *gin.Engine {
 	r.Use(middleware.AutoOptions())
 
 	r.GET("/ping", api.Ping())
-	authedGroup := r.Group("/")
+
+  authedGroup := r.Group("/")
 	authedGroup.Use(middleware.FirebaseAuth())
 	{
 		authedGroup.GET("/private", func(ctx *gin.Context) {
@@ -39,6 +40,8 @@ func initRoute(db *gorm.DB) *gin.Engine {
 
 		// profile
 		authedGroup.GET("/profiles", api.CheckProfile(db))
+		authedGroup.POST("/profiles", api.CreateProfile(db))
+		authedGroup.PUT("/profiles", api.EditProfile(db))
 	}
 
 	return r
