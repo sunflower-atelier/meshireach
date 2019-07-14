@@ -31,7 +31,7 @@ func initRoute(db *gorm.DB) *gin.Engine {
 
 	r.GET("/ping", api.Ping())
 
-  authedGroup := r.Group("/")
+	authedGroup := r.Group("/")
 	authedGroup.Use(middleware.FirebaseAuth())
 	{
 		authedGroup.GET("/private", func(ctx *gin.Context) {
