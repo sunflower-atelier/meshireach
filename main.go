@@ -39,6 +39,7 @@ func initRoute(db *gorm.DB) *gin.Engine {
 		})
 
 		// profile
+		authedGroup.GET("/profiles", api.CheckProfile(db))
 		authedGroup.POST("/profiles", api.CreateProfile(db))
 		authedGroup.PUT("/profiles", api.EditProfile(db))
 	}
