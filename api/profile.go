@@ -9,27 +9,32 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func firstCreate(db *gorm.DB, firebaseID string) bool {
+// 引数のfirebaseIDのユーザーのプロフィールが登録されているか確認
+// 既に登録されている場合はtrue
+// されていない場合はfalse
+func existProfile(db *gorm.DB, firebaseID string) bool {
 	search := model.User{}
 	count := 0
 
 	db.Where("firebase_id = ?", firebaseID).Find(&search).Count(&count)
 	if count != 0 {
-		return false
+		return true
 	}
-	return true
+	return false
 }
 
-// searchIDがdb内で一意であるかを確認
-func uniqueSearchID(db *gorm.DB, searchID string) bool {
+// searchIDが既に登録されているか確認
+// 既に登録されている場合はtrue
+// されていない場合はfalse
+func existSearchID(db *gorm.DB, searchID string) bool {
 	search := model.User{}
 	count := 0
 
 	db.Where("search_id = ?", searchID).Find(&search).Count(&count)
 	if count != 0 {
-		return false
+		return true
 	}
-	return true
+	return false
 }
 
 // CreateProfile is called when create user information
@@ -41,7 +46,7 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 		user.FirebaseID = c.MustGet("FirebaseID").(string)
 
 		// 一度profileをcreateしていたらerror
-		if !firstCreate(db, user.FirebaseID) {
+		if existProfile(db, user.FirebaseID) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "This user has already created his/her profile.",
@@ -49,23 +54,24 @@ func CreateProfile(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if uniqueSearchID(db, user.SearchID) {
-			db.Create(&user)
-
-			c.JSON(http.StatusCreated, gin.H{
-				"status":   "success",
-				"searchID": user.SearchID,
-				"name":     user.Name,
-				"message":  user.Message,
-			})
-		} else {
+		if existSearchID(db, user.SearchID) {
 			fmt.Printf("SearchID is not unique\n")
 
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "Search ID is not unique.",
 			})
+			return
 		}
+
+		db.Create(&user)
+
+		c.JSON(http.StatusCreated, gin.H{
+			"status":   "success",
+			"searchID": user.SearchID,
+			"name":     user.Name,
+			"message":  user.Message,
+		})
 
 	}
 }
@@ -76,27 +82,28 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 		user := model.User{}
 		c.BindJSON(&user)
 
-		if uniqueSearchID(db, user.SearchID) {
-			// 更新前の情報を取得
-			firebaseID := c.MustGet("FirebaseID")
-			beforeUser := model.User{FirebaseID: firebaseID.(string)}
-			db.First(&beforeUser)
-
-			// 更新
-			db.Model(&beforeUser).Updates(user)
-
-			c.JSON(http.StatusOK, gin.H{
-				"status":   "success",
-				"searchID": user.SearchID,
-				"name":     user.Name,
-				"message":  user.Message,
-			})
-		} else {
+		if existSearchID(db, user.SearchID) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "Search ID is not unique.",
 			})
+			return
 		}
+
+		// 更新前の情報を取得
+		firebaseID := c.MustGet("FirebaseID")
+		beforeUser := model.User{FirebaseID: firebaseID.(string)}
+		db.First(&beforeUser)
+
+		// 更新
+		db.Model(&beforeUser).Updates(user)
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":   "success",
+			"searchID": user.SearchID,
+			"name":     user.Name,
+			"message":  user.Message,
+		})
 	}
 }
 
