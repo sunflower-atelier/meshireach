@@ -2,6 +2,8 @@ package api
 
 import (
 	"bytes"
+	"fmt"
+	"meshireach/db/model"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -32,11 +34,8 @@ func initRoute(db *gorm.DB) *gin.Engine {
 }
 
 func TestPong(t *testing.T) {
-	// mock db
-	db, _, err := getDBMock()
-	if err != nil {
-		t.Fatal(err)
-	}
+	// test db
+	db := initDB()
 	defer db.Close()
 
 	// router
@@ -56,12 +55,10 @@ func TestPong(t *testing.T) {
 }
 
 func TestCreateProfileSuccess(t *testing.T) {
-	// mock db
-	db, _, err := getDBMock()
-	if err != nil {
-		t.Fatal(err)
-	}
+	// test db
+	db := initDB()
 	defer db.Close()
+	defer db.Delete(model.User{})
 
 	// router
 	r := initRoute(db)
@@ -82,17 +79,21 @@ func TestCreateProfileSuccess(t *testing.T) {
 	// assertion
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.JSONEq(t, json, w.Body.String())
+
+	/* dbに書き込まれているかのチェック */
+	search := model.User{}
+	db.First(&search)
+	db.First(&search)
+	fmt.Printf("name=%v\n", search.Name)
 }
 
 func TestCreateProfileFailure(t *testing.T) {
 	t.Skip("skip failure test")
 
-	// mock db
-	db, _, err := getDBMock()
-	if err != nil {
-		t.Fatal(err)
-	}
+	// test db
+	db := initDB()
 	defer db.Close()
+	defer db.Delete(model.User{})
 
 	// router
 	r := initRoute(db)
@@ -141,12 +142,10 @@ func TestCreateProfileFailure(t *testing.T) {
 }
 
 func TestEditProfile(t *testing.T) {
-	// mock db
-	db, _, err := getDBMock()
-	if err != nil {
-		t.Fatal(err)
-	}
+	// test db
+	db := initDB()
 	defer db.Close()
+	defer db.Delete(model.User{})
 
 	// router
 	r := initRoute(db)
