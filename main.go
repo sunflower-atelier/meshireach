@@ -18,9 +18,7 @@ func initDB() *gorm.DB {
 	}
 
 	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Friend_Relation{})
 	db.AutoMigrate(&model.Event{})
-	db.AutoMigrate(&model.Participants{})
 
 	return db
 }
