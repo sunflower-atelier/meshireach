@@ -29,14 +29,16 @@ jobs:
           key: modules-{{ .Branch }}-{{ checksum "go.mod" }}
           paths:
             - /go/pkg/mod/cache
-  test:
-    executor:
-      name: default
-    steps:
-      - checkout
+      - run:
+          name: Install golint
+          command: go get -u golang.org/x/lint/golint
+      - run: which golint
       - run:
           name: Check format
           command: (! gofmt -s -d . | grep '^')
+      - run:
+          name: Lint
+          command: golint main.go
       - run:
           name: Testing main.go
           command: go test
@@ -48,6 +50,4 @@ workflows:
   testing:
     jobs:
       - setup
-      - test:
-          requires:
-            - setup
+
