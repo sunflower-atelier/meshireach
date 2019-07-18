@@ -53,10 +53,11 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-
+		// 友達関係を登録
 		db.Model(&from).Association("Friends").Append(&to)
 		db.Model(&to).Association("Friends").Append(&from)
 
+		// 必要な情報を返す
 		c.JSON(http.StatusCreated, gin.H{
 			"status":   "success",
 			"searchID": to.SearchID,
