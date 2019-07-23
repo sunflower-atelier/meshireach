@@ -229,6 +229,41 @@ paths:
               error:
                 type: string
                 example: エラーの理由
+    get:
+      tags:
+      - "friends"
+      summary: "全友達情報を取得する"
+      description: ""
+      operationId: "GetAllFriends"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "取得に成功"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              friends:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "taro"
+                    searchID:
+                      type: string
+                      example: "taro_id"
+                    message:
+                      type: string
+                      example: "hello"
+
 
 securityDefinitions:
   api_key:
