@@ -67,3 +67,34 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 
 	}
 }
+
+type friendInfo struct {
+	Name     string `json:"name"`
+	SearchID string `json:"searchID"`
+	Message  string `json:"message"`
+}
+
+// GetAllFriends 友達情報の全取得
+func GetAllFriends(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// firebaseidからユーザーを取得
+		// 取得したユーザーに関連した友達を全取得
+		user := model.User{FirebaseID: c.MustGet("FirebaseID").(string)}
+		var friends []model.User
+		db.Model(&user).Related(&friends, "Friends")
+
+		// 必要な情報のみをコピー
+		result := make([]friendInfo, len(friends))
+		for idx, f := range friends {
+			result[idx].Name = f.Name
+			result[idx].SearchID = f.SearchID
+			result[idx].Message = f.Message
+		}
+
+		// 結果を返す
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "success",
+			"friends": result,
+		})
+	}
+}
