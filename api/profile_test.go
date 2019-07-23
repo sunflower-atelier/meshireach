@@ -2,16 +2,33 @@ package api
 
 import (
 	"bytes"
-	"fmt"
+	"log"
 	"meshireach/db/model"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/assert"
 )
+
+// not used now
+func initDB() *gorm.DB {
+	db, err := gorm.Open("mysql", "root:@tcp(db:3306)/meshireach_test?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Friend_Relation{})
+	db.AutoMigrate(&model.Event{})
+	db.AutoMigrate(&model.Participants{})
+
+	return db
+}
 
 func setDummyID() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -33,10 +50,47 @@ func initRoute(db *gorm.DB) *gin.Engine {
 	return r
 }
 
+var db *gorm.DB
+
+func TestMain(m *testing.M) {
+	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
+	pool, err := dockertest.NewPool("tcp://192.168.99.100:2376")
+	if err != nil {
+		log.Fatalf("Could not connect to docker: %s", err)
+	}
+
+	// pulls an image, creates a container based on it and runs it
+	resource, err := pool.Run("mysql", "8.0.16", nil)
+	if err != nil {
+		log.Fatalf("Could not start resource: %s", err)
+	}
+
+	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
+	if err := pool.Retry(func() error {
+		var err error
+		db, err = gorm.Open("mysql", "root:@tcp(db:3306)/meshireach_test?charset=utf8&parseTime=True&loc=Local")
+		if err != nil {
+			return err
+		}
+		return err
+	}); err != nil {
+		log.Fatalf("Could not connect to docker: %s", err)
+	}
+
+	code := m.Run()
+
+	// You can't defer this because os.Exit doesn't care for defer
+	if err := pool.Purge(resource); err != nil {
+		log.Fatalf("Could not purge resource: %s", err)
+	}
+
+	os.Exit(code)
+}
+
 func TestPong(t *testing.T) {
 	// test db
-	db := initDB()
-	defer db.Close()
+	// db := initDB()
+	// defer db.Close()
 
 	// router
 	r := initRoute(db)
@@ -56,9 +110,9 @@ func TestPong(t *testing.T) {
 
 func TestCreateProfileSuccess(t *testing.T) {
 	// test db
-	db := initDB()
-	defer db.Close()
-	defer db.Delete(model.User{})
+	// db := initDB()
+	// defer db.Close()
+	// defer db.Delete(model.User{})
 
 	// router
 	r := initRoute(db)
@@ -83,17 +137,17 @@ func TestCreateProfileSuccess(t *testing.T) {
 	/* dbに書き込まれているかのチェック */
 	search := model.User{}
 	db.First(&search)
-	db.First(&search)
-	fmt.Printf("name=%v\n", search.Name)
+	t.Log("---name---")
+	t.Log(search.Name)
 }
 
 func TestCreateProfileFailure(t *testing.T) {
 	t.Skip("skip failure test")
 
 	// test db
-	db := initDB()
-	defer db.Close()
-	defer db.Delete(model.User{})
+	// db := initDB()
+	// defer db.Close()
+	// defer db.Delete(model.User{})
 
 	// router
 	r := initRoute(db)
@@ -143,9 +197,9 @@ func TestCreateProfileFailure(t *testing.T) {
 
 func TestEditProfile(t *testing.T) {
 	// test db
-	db := initDB()
-	defer db.Close()
-	defer db.Delete(model.User{})
+	// db := initDB()
+	// defer db.Close()
+	// defer db.Delete(model.User{})
 
 	// router
 	r := initRoute(db)

@@ -8,6 +8,7 @@ executors:
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
           MYSQL_DB: meshireach_test
+          MYSQL_HOST: 127.0.0.1
     working_directory: /go/src/github.com/sunflower-atelier/meshireach
     environment:
       GO111MODULE: "on"
@@ -40,11 +41,8 @@ jobs:
           name: Lint
           command: golint main.go
       - run:
-          name: Testing main.go
-          command: go test
-      - run:
-          name: Testing ./test/some_tests
-          command: go test -run 'test/'
+          name: Test
+          command: go test -v ./...
 
 workflows:
   testing:
