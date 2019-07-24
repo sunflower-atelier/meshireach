@@ -1,0 +1,89 @@
+version: 2
+jobs:
+  setup:
+    docker:
+    - image: circleci/golang:1.12.2
+    - image: circleci/mysql:latest
+      environment:
+        MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        MYSQL_DB: meshireach_test
+        MYSQL_HOST: 127.0.0.1
+    working_directory: /go/src/github.com/sunflower-atelier/meshireach
+    steps:
+    - checkout
+    - restore_cache:
+        name: Restore go modules cache
+        key: modules-{{ .Branch }}-{{ checksum "go.mod" }}
+    - run:
+        name: Vendoring
+        command: go mod download
+    - save_cache:
+        name: Save go modules cache
+        key: modules-{{ .Branch }}-{{ checksum "go.mod" }}
+        paths:
+        - /go/pkg/mod/cache
+    - run:
+        name: Check format
+        command: (! gofmt -s -d . | grep '^')
+    - run:
+        name: Test
+        command: go test -v ./...
+    environment:
+    - GO111MODULE: 'on'
+workflows:
+  testing:
+    jobs:
+    - setup
+  version: 2
+
+# Original config.yml file:
+# version: 2.1
+# 
+# executors:
+#   default:
+#     docker:
+#       - image: circleci/golang:1.12.2
+#       - image: circleci/mysql:latest
+#         environment:
+#           MYSQL_ALLOW_EMPTY_PASSWORD: \"yes\"
+#           MYSQL_DB: meshireach_test
+#           MYSQL_HOST: 127.0.0.1
+#     working_directory: /go/src/github.com/sunflower-atelier/meshireach
+#     environment:
+#       GO111MODULE: \"on\"
+# 
+# jobs:
+#   setup:
+#     executor:
+#       name: default
+#     steps:
+#       - checkout
+#       - restore_cache:
+#           name: Restore go modules cache
+#           key: modules-{{ .Branch }}-{{ checksum \"go.mod\" }}
+#       - run:
+#           name: Vendoring
+#           command: go mod download
+#       - save_cache:
+#           name: Save go modules cache
+#           key: modules-{{ .Branch }}-{{ checksum \"go.mod\" }}
+#           paths:
+#             - /go/pkg/mod/cache
+#       # - run:
+#       #     name: Install golint
+#       #     command: go get -u golang.org/x/lint/golint
+#       # - run: which golint
+#       - run:
+#           name: Check format
+#           command: (! gofmt -s -d . | grep '^')
+#       # - run:
+#       #     name: Lint
+#       #     command: golint main.go
+#       - run:
+#           name: Test
+#           command: go test -v ./...
+# 
+# workflows:
+#   testing:
+#     jobs:
+#       - setup
