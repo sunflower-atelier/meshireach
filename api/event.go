@@ -9,14 +9,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type reqRegister {
-	Title    string    `json:"title"`     // タイトル
-	Deadline time.Time `json:"deadline"`  // 開始時刻(RFC3339)
-}
 
 func validDeadline(t time.Time) bool {
 	lower := time.Now()
-	upper := time.Truncate(24 * time.Hour).AddDate(0, 0, 3)
+	upper := t.Truncate(24 * time.Hour).AddDate(0, 0, 3) // ３日後まで
 
 	if !t.Before(lower) {
 		return false
@@ -29,7 +25,13 @@ func validDeadline(t time.Time) bool {
 	return true
 }
 
+// RegisterEvent イベントの登録
 func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
+	type reqRegister struct {
+		Title    string    `json:"title"`     // タイトル
+		Deadline time.Time `json:"deadline"`  // 開始時刻(RFC3339)
+	}
+
 	return func (c *gin.Context) {
 		req := reqRegister{}
 		c.BindJSON(&req)
@@ -44,9 +46,9 @@ func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// 登録
-		var owner User
+		var owner model.User
 		firebaseid := c.MustGet("FirebaseID").(string)
-		db.Where(&User{FirebaseID: firebaseid}).First(&owner)
-		db.Create(&Event{Owner: owner.ID, Title: req.Title, Deadline: req.Deadline})
+		db.Where(&model.User{FirebaseID: firebaseid}).First(&owner)
+		db.Create(&model.Event{Owner: owner.ID, Title: req.Title, Deadline: req.Deadline})
 	}
 }
