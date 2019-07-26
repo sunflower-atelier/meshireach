@@ -14,15 +14,11 @@ func validDeadline(t time.Time) bool {
 	lower := time.Now()
 	upper := t.Truncate(24 * time.Hour).AddDate(0, 0, 3) // ３日後まで
 
-	if !t.Before(lower) {
+	if lower.After(t) && upper.Before(t) {
+		return true
+	} else {
 		return false
 	}
-
-	if !t.After(upper) {
-		return false
-	}
-
-	return true
 }
 
 // RegisterEvent イベントの登録
