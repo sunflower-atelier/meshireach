@@ -12,8 +12,8 @@ import (
 // GetAllFriendEvents 友達の飯募集を全取得
 func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 	type result struct {
-		Owner     uint      `gorm:"column:event_owner" json:"owner_id"`
-		OwnerName string    `gorm:"column:user_name" json:owner_name`
+		Owner     uint      `gorm:"column:event_owner" json:"ownerId"`
+		OwnerName string    `gorm:"column:user_name" json:ownerName`
 		Title     string    `gorm:"column:event_title" json:"title"`
 		Deadline  time.Time `gorm:"column:event_deadline" json:"deadline"`
 		EventID   uint      `gorm:"column:id" json:"id"`
