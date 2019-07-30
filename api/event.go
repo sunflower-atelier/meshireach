@@ -12,11 +12,12 @@ import (
 // GetAllFriendEvents 友達の飯募集を全取得
 func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 	type result struct {
-		Owner     uint      `gorm:"column:event_owner" json:"ownerId"`
-		OwnerName string    `gorm:"column:user_name" json:ownerName`
-		Title     string    `gorm:"column:event_title" json:"title"`
-		Deadline  time.Time `gorm:"column:event_deadline" json:"deadline"`
-		EventID   uint      `gorm:"column:id" json:"id"`
+		EventID       uint      `gorm:"column:id" json:"id"`
+		Title         string    `gorm:"column:event_title" json:"title"`
+		OwnerID       uint      `gorm:"column:event_owner"`
+		OwnerSearchID string    `gorm:column:search_id json:ownerID`
+		OwnerName     string    `gorm:"column:user_name" json:owner`
+		Deadline      time.Time `gorm:"column:event_deadline" json:"deadline"`
 	}
 
 	return func(c *gin.Context) {
@@ -34,11 +35,12 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 			Joins("right join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
 			Scan(&results)
 
-		// 各eventのowner nameを取得
+		// 各eventのownerのsearch IDとnameを取得
 		// JOINするともうちょい早い気がする
 		for i := range results {
-			owner := model.User{}
+			owner := model.User{Model: gorm.Model{ID: results[i].OwnerID}}
 			db.First(&owner)
+			results[i].OwnerSearchID = owner.SearchID
 			results[i].OwnerName = owner.Name
 		}
 
