@@ -12,10 +12,11 @@ import (
 // GetAllFriendEvents 友達の飯募集を全取得
 func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 	type result struct {
-		Owner    uint      `gorm:"column:event_owner"`
-		Title    string    `gorm:"column:event_title"`
-		Deadline time.Time `gorm:"column:event_deadline"`
-		EventID  uint      `gorm:"column:id"`
+		Owner     uint      `gorm:"column:event_owner" json:"owner_id"`
+		OwnerName string    `gorm:"column:user_name" json:owner_name`
+		Title     string    `gorm:"column:event_title" json:"title"`
+		Deadline  time.Time `gorm:"column:event_deadline" json:"deadline"`
+		EventID   uint      `gorm:"column:id" json:"id"`
 	}
 
 	return func(c *gin.Context) {
@@ -32,6 +33,14 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 			Select("events.event_owner, events.event_title, events.event_deadline, events.id").
 			Joins("right join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
 			Scan(&results)
+
+		// 各eventのowner nameを取得
+		// JOINするともうちょい早い気がする
+		for i := range results {
+			owner := model.User{}
+			db.First(&owner)
+			results[i].OwnerName = owner.Name
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
