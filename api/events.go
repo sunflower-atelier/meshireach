@@ -3,6 +3,7 @@ package api
 import (
 	"meshireach/db/model"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -77,9 +78,9 @@ func GetAllAttendees(db *gorm.DB) gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		req := reqRegister{}
-		c.BindJSON(&req)
-		eventid := req.EventID
+		idstring := c.Param("id")
+		idInt, _ := strconv.Atoi(idstring)
+		eventid := uint(idInt)
 
 		// イベントを取得
 		event := model.Event{}
@@ -105,8 +106,11 @@ func GetAllAttendees(db *gorm.DB) gin.HandlerFunc {
 
 		// 結果を返す
 		c.JSON(http.StatusOK, gin.H{
-			"status":  "success",
-			"friends": result,
+			"status":   "success",
+			"owener":   event.Owner,
+			"title":    event.Title,
+			"deadline": event.Deadline,
+			"friends":  result,
 		})
 	}
 }
