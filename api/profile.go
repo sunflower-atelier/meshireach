@@ -91,9 +91,9 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// 更新前の情報を取得
-		firebaseID := c.MustGet("FirebaseID")
-		beforeUser := model.User{FirebaseID: firebaseID.(string)}
-		db.First(&beforeUser)
+		firebaseID := c.MustGet("FirebaseID").(string)
+		beforeUser := model.User{}
+		db.Where(&model.User{FirebaseID: firebaseID}).First(&beforeUser)
 
 		// 更新
 		db.Model(&beforeUser).Updates(user)
