@@ -29,17 +29,18 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		user := model.User{FirebaseID: c.MustGet("FirebaseID").(string)}
+		user := model.User{}
+		firebaseID := c.MustGet("FirebaseID").(string)
 
 		// UserIDをセット
-		db.First(&user)
+		db.Where(&model.User{FirebaseID: firebaseID}).First(&user)
 
 		var results []result
 		// join tableのfriendships tableとevents tableをJOINすることで
 		// events tableから友達の飯募集だけを抽出
 		// + 現在時刻よりあとのもののみを抽出
 		db.Table("friendships").Where("user_id = ?", user.ID).
-			Select("events.event_owner, events.event_title, events.event_deadline, events.id").
+			Select("events.id, events.event_title, events.event_owner, events.event_deadline").
 			Joins("right join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
 			Scan(&results)
 
@@ -56,7 +57,7 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
-			"events": results,
+			"events": events,
 		})
 	}
 }
