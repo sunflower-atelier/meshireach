@@ -290,16 +290,16 @@ paths:
                   properties:
                     id:
                       type: integer
-                      example: "1"
-                    ownerId:
-                      type: string
-                      example: meshimeshi
-                    ownerName:
-                      type: string
-                      example: "meshi taro"
+                      example: 1
                     title:
                       type: string
                       example: "ryoga ni ikuyo"
+                    ownerID:
+                      type: string
+                      example: "meshi"
+                    owner:
+                      type: string
+                      example: "meshi taro"
                     deadline:
                       type: string
                       example: "2019-07-30 00:00:00 +0000 UTC"
