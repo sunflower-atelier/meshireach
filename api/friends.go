@@ -75,7 +75,7 @@ func GetAllFriends(db *gorm.DB) gin.HandlerFunc {
 		SearchID string `json:"searchID"`
 		Message  string `json:"message"`
 	}
-	
+
 	return func(c *gin.Context) {
 		// firebaseidからユーザーを取得
 		// 取得したユーザーに関連した友達を全取得
