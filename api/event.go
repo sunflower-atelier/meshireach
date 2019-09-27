@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"meshireach/db/model"
 	"net/http"
 	"time"
@@ -12,6 +13,8 @@ import (
 func validDeadline(t time.Time) bool {
 	lower := time.Now()
 	upper := t.Truncate(24*time.Hour).AddDate(0, 0, 3) // ３日後まで
+
+	fmt.Printf("%v", lower)
 
 	if t.After(lower) && t.Before(upper) {
 		return true
@@ -49,7 +52,7 @@ func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
 		db.Create(&event)
 
 		c.JSON(http.StatusCreated, gin.H{
-			"eventid": event.ID,
+			"eventId": event.ID,
 		})
 	}
 }
