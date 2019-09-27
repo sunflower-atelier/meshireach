@@ -41,7 +41,7 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 		// + 現在時刻よりあとのもののみを抽出
 		db.Table("friendships").Where("user_id = ?", user.ID).
 			Select("events.id, events.event_title, events.event_owner, events.event_deadline").
-			Joins("right join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
+			Joins("inner join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
 			Scan(&results)
 
 		var events []eventPlus
