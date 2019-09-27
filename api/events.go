@@ -14,14 +14,15 @@ func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 
 	type reqRegister struct {
 		UserID  uint `json:"userID"`
-		EventID uint `json:"eventID"`
 	}
 
 	return func(c *gin.Context) {
 		req := reqRegister{}
 		c.BindJSON(&req)
 		userid := req.UserID
-		eventid := req.EventID
+		idstring := c.Param("id")
+		idInt, _ := strconv.Atoi(idstring)
+		eventid := uint(idInt)
 
 		// 登録ユーザを取得
 		user := model.User{}
