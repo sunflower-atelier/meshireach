@@ -263,6 +263,85 @@ paths:
                     message:
                       type: string
                       example: "hello"
+  /events:
+    post:
+      tags:
+      - "events"
+      summary: "飯募集を登録する"
+      description: ""
+      operationId: "register event"
+      cosumes: 
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        201:
+          description: "登録成功"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+        400:
+          description: "登録失敗"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: failure
+              error:
+                type: string
+                example: "error"
+  /events/{eventId}:
+    get:
+      tags:
+      - "events"
+      summary: "友達の飯情報を取得"
+      description: ""
+      operationId: "GetAllAttendees"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "取得に成功"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: "success"
+              owner: 
+                type: string
+                example: "taro"
+              title:
+                type: string
+                example: "event_title"
+              deadline:
+                type: string
+                example: "2019-09-27T14:37:09+09:00"
+              friends:
+                type: array
+                example: []
+        400:
+          description: "取得に失敗"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: "failure"
+              error: 
+                type: string
+                example: "This event has not be registered."
+
+        
+      
 
 
 securityDefinitions:
