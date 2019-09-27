@@ -44,6 +44,12 @@ func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
 		var owner model.User
 		firebaseid := c.MustGet("FirebaseID").(string)
 		db.Where(&model.User{FirebaseID: firebaseid}).First(&owner)
-		db.Create(&model.Event{Owner: owner.ID, Title: req.Title, Deadline: req.Deadline})
+
+		event := model.Event{Owner: owner.ID, Title: req.Title, Deadline: req.Deadline}
+		db.Create(&event)
+
+		c.JSON(http.StatusCreated, gin.H{
+			"eventid": event.ID,
+		})
 	}
 }
