@@ -13,7 +13,7 @@ import (
 func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 
 	type reqRegister struct {
-		UserID  uint `json:"userID"`
+		UserID uint `json:"userID"`
 	}
 
 	return func(c *gin.Context) {
