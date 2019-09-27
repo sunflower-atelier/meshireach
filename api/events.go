@@ -64,8 +64,8 @@ func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-// GetAllAttendees イベント参加者全取得
-func GetAllAttendees(db *gorm.DB) gin.HandlerFunc {
+// GetAllParticipants イベント参加者全取得
+func GetAllParticipants(db *gorm.DB) gin.HandlerFunc {
 
 	type reqRegister struct {
 		EventID uint `json:"eventID"`
