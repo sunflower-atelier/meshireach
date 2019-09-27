@@ -9,8 +9,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// RegisterEvents イベントへの参加
-func RegisterEvents(db *gorm.DB) gin.HandlerFunc {
+// JoinEvents イベントへの参加
+func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 
 	type reqRegister struct {
 		UserID  uint `json:"userID"`
@@ -25,7 +25,6 @@ func RegisterEvents(db *gorm.DB) gin.HandlerFunc {
 
 		// 登録ユーザを取得
 		user := model.User{}
-		db.Where(&model.User{Model: gorm.Model{ID: userid}}).First(&user)
 		if db.Where(&model.User{Model: gorm.Model{ID: userid}}).First(&user).RecordNotFound() {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
