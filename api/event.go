@@ -13,7 +13,7 @@ func validDeadline(t time.Time) bool {
 	lower := time.Now()
 	upper := t.Truncate(24*time.Hour).AddDate(0, 0, 3) // ３日後まで
 
-	if lower.After(t) && upper.Before(t) {
+	if t.After(lower) && t.Before(upper) {
 		return true
 	} else {
 		return false
