@@ -5,11 +5,20 @@ import (
 	"meshireach/db/model"
 	"meshireach/middleware"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
+
+func initLocale() {
+	loc, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		loc = time.FixedZone("Asia/Tokyo", 9*60*60)
+	}
+	time.Local = loc
+}
 
 func initDB() *gorm.DB {
 	db, err := gorm.Open("mysql", "root:@tcp(db:3306)/meshireach?charset=utf8&parseTime=True&loc=Local")
@@ -47,12 +56,15 @@ func initRoute(db *gorm.DB) *gin.Engine {
 
 		// events
 		authedGroup.GET("/events/subscriptions", api.GetAllFriendEvents(db))
+		authedGroup.POST("/events", api.RegisterEvent(db))
 	}
 
 	return r
 }
 
 func main() {
+	initLocale()
+
 	db := initDB()
 	defer db.Close()
 

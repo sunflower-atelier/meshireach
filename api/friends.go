@@ -8,12 +8,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type reqRegister struct {
-	SearchID string `json:"searchID"`
-}
-
 // RegisterFriends 友達登録する
 func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
+	type reqRegister struct {
+		SearchID string `json:"searchID"`
+	}
+
 	return func(c *gin.Context) {
 		req := reqRegister{}
 		c.BindJSON(&req)
@@ -68,14 +68,14 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-type friendInfo struct {
-	Name     string `json:"name"`
-	SearchID string `json:"searchID"`
-	Message  string `json:"message"`
-}
-
 // GetAllFriends 友達情報の全取得
 func GetAllFriends(db *gorm.DB) gin.HandlerFunc {
+	type friendInfo struct {
+		Name     string `json:"name"`
+		SearchID string `json:"searchID"`
+		Message  string `json:"message"`
+	}
+
 	return func(c *gin.Context) {
 		// firebaseidからユーザーを取得
 		// 取得したユーザーに関連した友達を全取得

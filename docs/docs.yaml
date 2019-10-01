@@ -263,6 +263,7 @@ paths:
                     message:
                       type: string
                       example: "hello"
+                      
   /events:
     get:
       tags:
@@ -303,6 +304,54 @@ paths:
                     deadline:
                       type: string
                       example: "2019-07-30 00:00:00 +0000 UTC"
+                      
+     post:
+      tags:
+      - "events"
+      summary: "飯を登録すす"
+      description: ""
+      operationId: "RegisterEvents"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "登録するeventの情報"
+        required: true
+        schema:
+            title: success
+            type: object
+            properties:
+              title:
+                type: string
+                example: "popopo meshi"
+              deadline:
+                type: string
+                example: "2019-09-28T00:45:00+09:00"
+      responses:
+        201:
+          description: "event登録した"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              eventId:
+                type: int
+                example: 1
+        400:
+          description: "eventを作れなかった"
+          schema:
+            title: hoge
+            type: object
+            properties:
+              status:
+                type: string
+                example: failure
+              error:
+                type: string
+                example: エラーの理由
 
 securityDefinitions:
   api_key:
