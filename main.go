@@ -54,7 +54,8 @@ func initRoute(db *gorm.DB) *gin.Engine {
 		authedGroup.POST("/friends", api.RegisterFriends(db))
 		authedGroup.GET("/friends", api.GetAllFriends(db))
 
-		// event
+		// events
+		authedGroup.GET("/events/subscriptions", api.GetAllFriendEvents(db))
 		authedGroup.POST("/events", api.RegisterEvent(db))
 	}
 

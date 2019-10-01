@@ -263,8 +263,49 @@ paths:
                     message:
                       type: string
                       example: "hello"
+                      
   /events:
-    post:
+    get:
+      tags:
+        - "events"
+      summary: "友達の飯募集一覧を取得"
+      description: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            title: ""
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              events:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    title:
+                      type: string
+                      example: "ryoga ni ikuyo"
+                    ownerID:
+                      type: string
+                      example: "meshi"
+                    owner:
+                      type: string
+                      example: "meshi taro"
+                    deadline:
+                      type: string
+                      example: "2019-07-30 00:00:00 +0000 UTC"
+                      
+     post:
       tags:
       - "events"
       summary: "飯を登録すす"
@@ -311,7 +352,6 @@ paths:
               error:
                 type: string
                 example: エラーの理由
-
 
 securityDefinitions:
   api_key:
