@@ -44,7 +44,7 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 			Joins("inner join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
 			Scan(&results)
 
-		var events []eventPlus
+		events := []eventPlus{}
 		// 各eventのownerのsearch IDとnameを取得
 		// JOINするともうちょい早い気がする
 		for i := range results {
