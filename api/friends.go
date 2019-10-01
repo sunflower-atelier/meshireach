@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"meshireach/db/model"
 	"net/http"
 
@@ -44,8 +45,9 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		//　友達と友達にはなれない
-		tocopy := to
-		if db.Model(&from).Association("Friends").Find(&tocopy).Count() != 0 {
+		var friendCount = 0 // 1 or 0
+		db.Table("friendships").Where("user_id = ? AND friend_id = ?", from.ID, to.ID).Count(&friendCount)
+		if friendCount != 0 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "Cannot make a friend with some friends already.",
