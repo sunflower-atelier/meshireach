@@ -58,10 +58,10 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "success",
 			"events": events,
-    })
+		})
 	}
 }
-      
+
 func validDeadline(t time.Time) bool {
 	lower := time.Now()
 	upper := t.Truncate(24*time.Hour).AddDate(0, 0, 3) // ３日後まで
