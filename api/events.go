@@ -19,7 +19,7 @@ func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 		// 登録ユーザ(参加者)を取得
 		userFirebaseid := c.MustGet("FirebaseID")
 		user := model.User{}
-		if db.Table("Users").Where("firebase_id = ?", userFirebaseid).First(&user).RecordNotFound() {
+		if db.Table("users").Where("firebase_id = ?", userFirebaseid).First(&user).RecordNotFound() {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "This user has not be registered.",
@@ -50,7 +50,7 @@ func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 
 		//　既にイベントに登録されている場合登録できない
 		var userCount = 0
-		db.Table("participants").Where("user_id = ? AND event_id = ?", user.ID, event.ID).Count(&userCount)
+		db.Table("participants").Where("user = ? AND event = ?", user.ID, event.ID).Count(&userCount)
 		if userCount != 0 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
