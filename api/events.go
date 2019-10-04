@@ -11,11 +11,6 @@ import (
 
 // JoinEvents イベントへの参加
 func JoinEvents(db *gorm.DB) gin.HandlerFunc {
-
-	type reqRegister struct {
-		UserID uint `json:"userID"`
-	}
-
 	return func(c *gin.Context) {
 		idstring := c.Param("id")
 		idInt, _ := strconv.Atoi(idstring)
