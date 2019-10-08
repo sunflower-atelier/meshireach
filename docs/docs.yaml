@@ -324,7 +324,7 @@ paths:
               deadline:
                 type: string
                 example: "2019-09-27T14:37:09+09:00"
-              friends:
+              participants:
                 type: array
                 example: []
         400:
