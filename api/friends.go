@@ -8,12 +8,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type reqRegister struct {
-	SearchID string `json:"searchID"`
-}
-
 // RegisterFriends 友達登録する
 func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
+	type reqRegister struct {
+		SearchID string `json:"searchID"`
+	}
+
 	return func(c *gin.Context) {
 		req := reqRegister{}
 		c.BindJSON(&req)
@@ -44,8 +44,9 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		//　友達と友達にはなれない
-		tocopy := to
-		if db.Model(&from).Association("Friends").Find(&tocopy).Count() != 0 {
+		var friendCount = 0 // 1 or 0
+		db.Table("friendships").Where("user_id = ? AND friend_id = ?", from.ID, to.ID).Count(&friendCount)
+		if friendCount != 0 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "Cannot make a friend with some friends already.",
@@ -68,14 +69,14 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-type friendInfo struct {
-	Name     string `json:"name"`
-	SearchID string `json:"searchID"`
-	Message  string `json:"message"`
-}
-
 // GetAllFriends 友達情報の全取得
 func GetAllFriends(db *gorm.DB) gin.HandlerFunc {
+	type friendInfo struct {
+		Name     string `json:"name"`
+		SearchID string `json:"searchID"`
+		Message  string `json:"message"`
+	}
+
 	return func(c *gin.Context) {
 		// firebaseidからユーザーを取得
 		// 取得したユーザーに関連した友達を全取得
