@@ -106,11 +106,11 @@ func GetAllParticipants(db *gorm.DB) gin.HandlerFunc {
 
 		// 結果を返す
 		c.JSON(http.StatusOK, gin.H{
-			"status":   "success",
-			"owener":   event.Owner,
-			"title":    event.Title,
-			"deadline": event.Deadline,
-			"friends":  result,
+			"status":       "success",
+			"owener":       event.Owner,
+			"title":        event.Title,
+			"deadline":     event.Deadline,
+			"participants": result,
 		})
 	}
 }
