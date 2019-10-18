@@ -71,7 +71,7 @@ func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 		authedGroup.PUT("/profiles", api.EditProfile(db))
 
 		// friends
-		authedGroup.POST("/friends", api.RegisterFriends(db))
+		authedGroup.POST("/friends", api.RegisterFriends(fapp, db))
 		authedGroup.GET("/friends", api.GetAllFriends(db))
 
 		// events
@@ -81,6 +81,9 @@ func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 
 		// subscriptions
 		authedGroup.GET("/events-subscriptions", api.GetAllFriendEvents(db))
+
+		// device
+		authedGroup.POST("/device/token", api.RegisterDeviceToken(db))
 	}
 
 	return r
@@ -92,7 +95,9 @@ func testMessaging(app *firebase.App) gin.HandlerFunc {
 		netctx := context.Background()
 		client, err := app.Messaging(netctx)
 		if err != nil {
-			c.String(http.StatusOK, fmt.Sprintf("error getting Messaging client: %v\n", err))
+			s := fmt.Sprintf("error getting Messaging client: %v\n", err)
+			fmt.Print(s)
+			c.String(http.StatusOK, s)
 			c.Abort()
 			return
 		}
@@ -114,7 +119,9 @@ func testMessaging(app *firebase.App) gin.HandlerFunc {
 		// registration token.
 		response, err := client.Send(netctx, message)
 		if err != nil {
-			c.String(http.StatusOK, fmt.Sprintf("error response Messaging client: %v\n", err))
+			s := fmt.Sprintf("error response Messaging client: %v\n", err)
+			fmt.Print(s)
+			c.String(http.StatusOK, s)
 			c.Abort()
 			return
 		}
