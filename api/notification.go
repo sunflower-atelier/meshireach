@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"meshireach/db/model"
 	"net/http"
 	"context"
@@ -43,13 +44,6 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 	if err != nil {
 		return err
 	}
-	
-	d := make(map[string]string)
-	d["title"] = title
-	d["body"] = body
-	for k, v := range *data {
-		d[k] = v
-	}
 
 	wg := sync.WaitGroup{}
 	for owner := range owners { // ここもgo routineにできそう
@@ -61,7 +55,15 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 			wg.Add(1)
 			go func(){
 				defer wg.Done()
-				message := &messaging.Message{Data: d, Token: dev.Token}
+				fmt.Printf("[NOTIFICATION] %v\n", dev.Token)
+				message := &messaging.Message{
+					Data: *data,
+					Notification: &messaging.Notification {
+						Title: title,
+						Body: body,
+					},
+					Token: dev.Token,
+				}
 				_, err := client.Send(netctx, message)
 				if err != nil {
 					//return err
