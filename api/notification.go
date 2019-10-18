@@ -28,7 +28,7 @@ func RegisterDeviceToken(db *gorm.DB) gin.HandlerFunc {
 		req := reqRegister{}
 		c.BindJSON(&req)
 
-		db.Create(model.Device{Owner: user.ID, Token: req.DeviceToken})
+		db.Create(&model.Device{Owner: user.ID, Token: req.DeviceToken})
 
 		c.JSON(http.StatusCreated, gin.H{
 			"status": "success",
