@@ -34,6 +34,7 @@ func initDB() *gorm.DB {
 
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Event{})
+	db.AutoMigrate(&model.Device{})
 
 	return db
 }
