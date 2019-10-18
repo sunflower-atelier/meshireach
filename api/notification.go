@@ -30,7 +30,7 @@ func RegisterDeviceToken(db *gorm.DB) gin.HandlerFunc {
 
 		db.Create(model.Device{Owner: user.ID, Token: req.DeviceToken})
 
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusCreated, gin.H{
 			"status": "success",
 		})
 	}
