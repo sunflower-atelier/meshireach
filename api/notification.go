@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"meshireach/db/model"
 	"net/http"
 	"context"
@@ -46,7 +45,7 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 	}
 
 	wg := sync.WaitGroup{}
-	for owner := range owners { // ここもgo routineにできそう
+	for _, owner := range owners { // ここもgo routineにできそう
 		// get owner's devices
 		var devices []model.Device
 		db.Where("device_owner = ?", owner).Find(&devices)
@@ -55,7 +54,6 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 			wg.Add(1)
 			go func(){
 				defer wg.Done()
-				fmt.Printf("[NOTIFICATION] %v\n", dev.Token)
 				message := &messaging.Message{
 					Data: *data,
 					Notification: &messaging.Notification {
