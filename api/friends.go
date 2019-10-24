@@ -60,7 +60,7 @@ func RegisterFriends(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 		db.Model(&from).Association("Friends").Append(&to)
 		db.Model(&to).Association("Friends").Append(&from)
 
-		SendNotification(fapp, db, []uint{to.ID}, "友達登録", from.Name + "と友達になりました", &map[string]string{})
+		SendNotification(fapp, db, []uint{to.ID}, "友達登録", from.Name+"と友達になりました", &map[string]string{})
 
 		// 必要な情報を返す
 		c.JSON(http.StatusCreated, gin.H{

@@ -1,18 +1,16 @@
 package api
 
 import (
+	"context"
 	"meshireach/db/model"
 	"net/http"
-	"context"
 	"sync"
 
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/messaging"
-
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
-
 
 // RegisterDeviceToken デバイストークンとそのオーナーの登録
 func RegisterDeviceToken(db *gorm.DB) gin.HandlerFunc {
@@ -49,16 +47,16 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 		// get owner's devices
 		var devices []model.Device
 		db.Where("device_owner = ?", owner).Find(&devices)
-		
+
 		for _, dev := range devices {
 			wg.Add(1)
-			go func(){
+			go func() {
 				defer wg.Done()
 				message := &messaging.Message{
 					Data: *data,
-					Notification: &messaging.Notification {
+					Notification: &messaging.Notification{
 						Title: title,
-						Body: body,
+						Body:  body,
 					},
 					Token: dev.Token,
 				}
