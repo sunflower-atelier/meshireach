@@ -12,6 +12,6 @@ type User struct {
 	Name       string   `gorm:"column:user_name" json:"name"`                                      // スクリーンネーム
 	Message    string   `gorm:"column:user_message" json:"message"`                                // 一言メッセージ
 	Friends    []*User  `gorm:"many2many:friendships; association_jointable_foreignkey:friend_id"` // 友達リスト
-	Events     []*Event `gorm:"many2many:participants"`                                            // 参加しているイベント
+	Events     []*Event `gorm:"many2many:users_events"`                                            // 参加しているイベント
 	// 作ったイベントも持つべきかも
 }

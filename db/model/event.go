@@ -13,5 +13,5 @@ type Event struct {
 	Owner    uint      `gorm:"column:event_owner"`     // イベント作成者(joinのためのforeign keyを設定すべきかも)
 	Title    string    `gorm:"column:event_title"`     // タイトル
 	Deadline time.Time `gorm:"column:event_deadline"`  // 開始時刻
-	Users    []*User   `gorm:"many2many:participants"` // 参加者リスト
+	Users    []*User   `gorm:"many2many:users_events"` // 参加者リスト
 }
