@@ -216,6 +216,27 @@ func GetMyEvents(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// GetAllJoinEvents 自分が参加している飯募集を全取得
+func GetAllJoinEvents(db *gorm.DB) gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		user := model.User{}
+		firebaseID := c.MustGet("FirebaseID").(string)
+
+		// UserIDをセット
+		db.Where(&model.User{FirebaseID: firebaseID}).First(&user)
+
+		var results []result
+		// events tableから自分の飯募集だけを抽出
+		// 自分が参加しているリストを取得
+		var joinlist []model.Event
+		db.Model(&user).Related(&joinlist, "Events")
+		db.Model(&joinlist).Scan(&results)
+
+		sendEventToClient(results, db, c)
+	}
+}
+
 func sendEventToClient(results []result, db *gorm.DB, c *gin.Context) {
 
 	// response用
