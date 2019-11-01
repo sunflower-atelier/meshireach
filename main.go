@@ -62,6 +62,9 @@ func initRoute(db *gorm.DB) *gin.Engine {
 
 		// subscriptions
 		authedGroup.GET("/events-subscriptions", api.GetAllFriendEvents(db))
+
+		// joining-list
+		authedGroup.GET("/events-joining-list", api.GetAllJoinEvents(db))
 	}
 
 	return r
