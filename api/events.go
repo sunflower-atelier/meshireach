@@ -227,9 +227,9 @@ func GetAllJoinEvents(db *gorm.DB) gin.HandlerFunc {
 		db.Where(&model.User{FirebaseID: firebaseID}).First(&user)
 
 		var results []result
+		var joinlist []model.Event
 		// events tableから自分の飯募集だけを抽出
 		// 自分が参加しているリストを取得
-		var joinlist []model.Event
 		db.Model(&user).Related(&joinlist, "Events")
 		db.Model(&joinlist).Scan(&results)
 
