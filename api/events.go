@@ -166,24 +166,16 @@ func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// DBからeventを取ってくるときに使うstruct
+type result struct {
+	EventID  uint      `gorm:"column:id"`
+	Title    string    `gorm:"column:event_title"`
+	OwnerID  uint      `gorm:"column:event_owner"`
+	Deadline time.Time `gorm:"column:event_deadline"`
+}
+
 // GetAllFriendEvents 友達の飯募集を全取得
 func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
-	// DB用
-	type result struct {
-		EventID  uint      `gorm:"column:id"`
-		Title    string    `gorm:"column:event_title"`
-		OwnerID  uint      `gorm:"column:event_owner"`
-		Deadline time.Time `gorm:"column:event_deadline"`
-	}
-
-	// response用
-	type eventPlus struct {
-		EventID       uint      `json:"id"`
-		Title         string    `json:"title"`
-		OwnerSearchID string    `json:"ownerID"`
-		OwnerName     string    `json:"owner"`
-		Deadline      time.Time `json:"deadline"`
-	}
 
 	return func(c *gin.Context) {
 		user := model.User{}
@@ -201,20 +193,52 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 			Joins("inner join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
 			Scan(&results)
 
-		events := []eventPlus{}
-		// 各eventのownerのsearch IDとnameを取得
-		// JOINするともうちょい早い気がする
-		for i := range results {
-			owner := model.User{Model: gorm.Model{ID: results[i].OwnerID}}
-			db.First(&owner)
-
-			tmp := eventPlus{results[i].EventID, results[i].Title, owner.SearchID, owner.Name, results[i].Deadline}
-			events = append(events, tmp)
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"status": "success",
-			"events": events,
-		})
+		sendEventToClient(results, db, c)
 	}
+}
+
+// GetMyEvents 自分の飯募集を全取得
+func GetMyEvents(db *gorm.DB) gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		user := model.User{}
+		firebaseID := c.MustGet("FirebaseID").(string)
+
+		// UserIDをセット
+		db.Where(&model.User{FirebaseID: firebaseID}).First(&user)
+
+		var results []result
+		// events tableから自分の飯募集だけを抽出
+		// + 現在時刻よりあとのもののみを抽出
+		db.Model(&model.Event{}).Where("event_owner = ? AND event_deadline > ?", user.ID, time.Now()).Scan(&results)
+
+		sendEventToClient(results, db, c)
+	}
+}
+
+func sendEventToClient(results []result, db *gorm.DB, c *gin.Context) {
+
+	// response用
+	type eventPlus struct {
+		EventID       uint      `json:"id"`
+		Title         string    `json:"title"`
+		OwnerSearchID string    `json:"ownerID"`
+		OwnerName     string    `json:"owner"`
+		Deadline      time.Time `json:"deadline"`
+	}
+
+	events := []eventPlus{}
+	// 各eventのownerのsearch IDとnameを取得
+	for i := range results {
+		owner := model.User{Model: gorm.Model{ID: results[i].OwnerID}}
+		db.First(&owner)
+
+		tmp := eventPlus{results[i].EventID, results[i].Title, owner.SearchID, owner.Name, results[i].Deadline}
+		events = append(events, tmp)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"events": events,
+	})
 }
