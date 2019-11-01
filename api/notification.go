@@ -26,6 +26,15 @@ func RegisterDeviceToken(db *gorm.DB) gin.HandlerFunc {
 		req := reqRegister{}
 		c.BindJSON(&req)
 
+		count := 0
+		db.Where("device_owner = ? AND device_token = ?", user.ID, req.DeviceToken).Count(&count)
+		if count != 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "existed",
+			})
+			return
+		}
+
 		db.Create(&model.Device{Owner: user.ID, Token: req.DeviceToken})
 
 		c.JSON(http.StatusCreated, gin.H{
@@ -43,29 +52,34 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 	}
 
 	wg := sync.WaitGroup{}
-	for _, owner := range owners { // ここもgo routineにできそう
-		// get owner's devices
-		var devices []model.Device
-		db.Where("device_owner = ?", owner).Find(&devices)
+	for _, owner := range owners {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 
-		for _, dev := range devices {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				message := &messaging.Message{
-					Data: *data,
-					Notification: &messaging.Notification{
-						Title: title,
-						Body:  body,
-					},
-					Token: dev.Token,
-				}
-				_, err := client.Send(netctx, message)
-				if err != nil {
-					//return err
-				}
-			}()
-		}
+			// get owner's devices
+			var devices []model.Device
+			db.Where("device_owner = ?", owner).Find(&devices)
+
+			for _, dev := range devices {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					message := &messaging.Message{
+						Data: *data,
+						Notification: &messaging.Notification{
+							Title: title,
+							Body:  body,
+						},
+						Token: dev.Token,
+					}
+					_, err := client.Send(netctx, message)
+					if err != nil {
+						//return err
+					}
+				}()
+			}
+		}()
 
 	}
 	wg.Wait()
