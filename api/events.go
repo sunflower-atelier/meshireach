@@ -184,14 +184,31 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 		// UserIDをセット
 		db.Where(&model.User{FirebaseID: firebaseID}).First(&user)
 
-		var results []result
+		var preresults []result
 		// join tableのfriendships tableとevents tableをJOINすることで
 		// events tableから友達の飯募集だけを抽出
 		// + 現在時刻よりあとのもののみを抽出
 		db.Table("friendships").Where("user_id = ?", user.ID).
 			Select("events.id, events.event_title, events.event_owner, events.event_deadline").
 			Joins("inner join events on events.event_owner = friendships.friend_id AND events.event_deadline > ?", time.Now()).
-			Scan(&results)
+			Scan(&preresults)
+
+		var joinlist []model.Event
+		db.Model(&user).Related(&joinlist, "Events")
+
+		var counter int
+		var results []result
+		for i := range preresults {
+			counter = 0
+			for j := range joinlist {
+				if results[i].EventID != joinlist[j].ID {
+					counter = counter + 1
+				}
+			}
+			if counter == len(joinlist) {
+				results = append(results, preresults[i])
+			}
+		}
 
 		sendEventToClient(results, db, c)
 	}
@@ -231,13 +248,6 @@ func GetAllJoinEvents(db *gorm.DB) gin.HandlerFunc {
 		// 自分が参加している飯募集のリストを取得
 		db.Model(&user).Related(&joinlist, "Events")
 		db.Model(&joinlist).Where("event_deadline > ?", time.Now().Add(-10*time.Minute)).Scan(&results)
-
-		/*
-			for i := range joinlist {
-				tmp := result{joinlist[i].ID, joinlist[i].Title, joinlist[i].Owner, joinlist[i].Deadline}
-				results = append(results, tmp)
-			}
-		*/
 
 		sendEventToClient(results, db, c)
 	}
