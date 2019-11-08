@@ -201,7 +201,7 @@ func GetAllFriendEvents(db *gorm.DB) gin.HandlerFunc {
 		for i := range preresults {
 			counter = 0
 			for j := range joinlist {
-				if results[i].EventID != joinlist[j].ID {
+				if preresults[i].EventID != joinlist[j].ID {
 					counter = counter + 1
 				}
 			}
