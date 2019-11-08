@@ -248,7 +248,7 @@ func GetAllJoinEvents(db *gorm.DB) gin.HandlerFunc {
 		// 自分が参加している飯募集のリストを取得
 		db.Model(&user).Related(&joinlist, "Events")
 		for i := range joinlist {
-			if joinlist[i].Deadline.Before(time.Now().Add(-10 * time.Minute)) {
+			if !joinlist[i].Deadline.Before(time.Now().Add(-10 * time.Minute)) {
 				tmp := result{joinlist[i].ID, joinlist[i].Title, joinlist[i].Owner, joinlist[i].Deadline}
 				results = append(results, tmp)
 			}
