@@ -228,10 +228,13 @@ func GetAllJoinEvents(db *gorm.DB) gin.HandlerFunc {
 
 		var results []result
 		var joinlist []model.Event
-		// events tableから自分の飯募集だけを抽出
-		// 自分が参加しているリストを取得
+		// 自分が参加している飯募集のリストを取得
 		db.Model(&user).Related(&joinlist, "Events")
-		db.Model(&joinlist).Scan(&results)
+
+		for i := range joinlist {
+			tmp := result{joinlist[i].ID, joinlist[i].Title, joinlist[i].Owner, joinlist[i].Deadline}
+			results = append(results, tmp)
+		}
 
 		sendEventToClient(results, db, c)
 	}
