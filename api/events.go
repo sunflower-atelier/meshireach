@@ -1,11 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"meshireach/db/model"
 	"net/http"
 	"strconv"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -133,7 +135,7 @@ func validDeadline(t time.Time) bool {
 }
 
 // RegisterEvent イベントの登録
-func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
+func RegisterEvent(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 	type reqRegister struct {
 		Title    string    `json:"title"`    // タイトル
 		Deadline time.Time `json:"deadline"` // 開始時刻(RFC3339)
@@ -159,6 +161,21 @@ func RegisterEvent(db *gorm.DB) gin.HandlerFunc {
 
 		event := model.Event{Owner: owner.ID, Title: req.Title, Deadline: req.Deadline}
 		db.Create(&event)
+
+		// イベントオーナーの友達全員に通知を送る
+		_, month, day := event.Deadline.Date()
+		hour, min, _ := event.Deadline.Clock()
+		var friends []model.User
+		db.Model(&owner).Related(&friends, "Friends")
+		friendIDs := make([]uint, len(friends))
+		for idx, f := range friends {
+			friendIDs[idx] = f.ID
+		}
+		title := fmt.Sprintf("%sさんがメシ仲間を募集中！", owner.Name)
+		contents := fmt.Sprintf("%s\n%s月%s日%s時%s分から\n",
+			event.Title,
+			month, day, hour, min)
+		SendNotification(fapp, db, friendIDs, title, contents, &map[string]string{})
 
 		c.JSON(http.StatusCreated, gin.H{
 			"eventId": event.ID,
