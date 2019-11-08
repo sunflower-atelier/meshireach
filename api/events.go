@@ -172,7 +172,7 @@ func RegisterEvent(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 			friendIDs[idx] = f.ID
 		}
 		title := fmt.Sprintf("%sさんがメシ仲間を募集中！", owner.Name)
-		contents := fmt.Sprintf("%s\n%s月%s日%s時%s分から\n",
+		contents := fmt.Sprintf("%s [%d/%d-%d:%d~]",
 			event.Title,
 			month, day, hour, min)
 		SendNotification(fapp, db, friendIDs, title, contents, &map[string]string{})

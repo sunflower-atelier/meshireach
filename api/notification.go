@@ -27,7 +27,7 @@ func RegisterDeviceToken(db *gorm.DB) gin.HandlerFunc {
 		c.BindJSON(&req)
 
 		count := 0
-		db.Where("device_owner = ? AND device_token = ?", user.ID, req.DeviceToken).Count(&count)
+		db.Table("devices").Where("device_owner = ? AND device_token = ?", user.ID, req.DeviceToken).Count(&count)
 		if count != 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "existed",
@@ -54,7 +54,7 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 	wg := sync.WaitGroup{}
 	for _, owner := range owners {
 		wg.Add(1)
-		go func() {
+		go func(owner uint) {
 			defer wg.Done()
 
 			// get owner's devices
@@ -63,7 +63,7 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 
 			for _, dev := range devices {
 				wg.Add(1)
-				go func() {
+				go func(devToken string) {
 					defer wg.Done()
 					message := &messaging.Message{
 						Data: *data,
@@ -77,9 +77,9 @@ func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title stri
 					if err != nil {
 						//return err
 					}
-				}()
+				}(dev.Token)
 			}
-		}()
+		}(owner)
 
 	}
 	wg.Wait()
