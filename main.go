@@ -1,15 +1,20 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"meshireach/api"
 	"meshireach/db/model"
 	"meshireach/middleware"
 	"net/http"
+	"os"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"google.golang.org/api/option"
 )
 
 func initLocale() {
@@ -28,18 +33,30 @@ func initDB() *gorm.DB {
 
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Event{})
+	db.AutoMigrate(&model.Device{})
 
 	return db
 }
 
-func initRoute(db *gorm.DB) *gin.Engine {
+func initFirebaseApp() *firebase.App {
+	opt := option.WithCredentialsFile("./key/otameshi-firebase-adminsdk.json")
+	app, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		fmt.Printf("error initializing app: %v", err)
+		os.Exit(1)
+	}
+	return app
+}
+
+func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.AutoOptions())
 
+	// 生存確認用
 	r.GET("/ping", api.Ping())
 
 	authedGroup := r.Group("/")
-	authedGroup.Use(middleware.FirebaseAuth())
+	authedGroup.Use(middleware.FirebaseAuth(fapp))
 	{
 		authedGroup.GET("/private", func(ctx *gin.Context) {
 			ctx.String(http.StatusOK, "認証成功！")
@@ -51,20 +68,24 @@ func initRoute(db *gorm.DB) *gin.Engine {
 		authedGroup.PUT("/profiles", api.EditProfile(db))
 
 		// friends
-		authedGroup.POST("/friends", api.RegisterFriends(db))
+		authedGroup.POST("/friends", api.RegisterFriends(fapp, db))
 		authedGroup.GET("/friends", api.GetAllFriends(db))
 
 		// events
 		authedGroup.POST("/events/:id/join", api.JoinEvents(db))
 		authedGroup.GET("/events/:id/participants", api.GetAllParticipants(db))
-		authedGroup.POST("/events", api.RegisterEvent(db))
+		authedGroup.POST("/events", api.RegisterEvent(fapp, db))
 		authedGroup.GET("/events", api.GetMyEvents(db))
 
 		// subscriptions
 		authedGroup.GET("/events-subscriptions", api.GetAllFriendEvents(db))
 
+		// device
+		authedGroup.POST("/device/token", api.RegisterDeviceToken(db))
+
 		// joining-list
 		authedGroup.GET("/events-joining-list", api.GetAllJoinEvents(db))
+
 	}
 
 	return r
@@ -76,6 +97,8 @@ func main() {
 	db := initDB()
 	defer db.Close()
 
-	r := initRoute(db)
+	app := initFirebaseApp()
+
+	r := initRoute(db, app)
 	r.Run(":3000")
 }

@@ -6,10 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+
+	firebase "firebase.google.com/go"
 )
 
 // RegisterFriends 友達登録する
-func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
+func RegisterFriends(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 	type reqRegister struct {
 		SearchID string `json:"searchID"`
 	}
@@ -57,6 +59,8 @@ func RegisterFriends(db *gorm.DB) gin.HandlerFunc {
 		// 友達関係を登録
 		db.Model(&from).Association("Friends").Append(&to)
 		db.Model(&to).Association("Friends").Append(&from)
+
+		SendNotification(fapp, db, []uint{to.ID}, "友達登録", from.Name+"と友達になりました", &map[string]string{})
 
 		// 必要な情報を返す
 		c.JSON(http.StatusCreated, gin.H{

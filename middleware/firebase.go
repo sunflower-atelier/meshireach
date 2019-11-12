@@ -11,19 +11,10 @@ import (
 	firebase "firebase.google.com/go"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/option"
 )
 
-func FirebaseAuth() gin.HandlerFunc {
+func FirebaseAuth(app *firebase.App) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// サーバー起動時に一回やればいい気がする
-		opt := option.WithCredentialsFile("./key/otameshi-firebase-adminsdk.json")
-		app, err := firebase.NewApp(context.Background(), nil, opt)
-		if err != nil {
-			fmt.Printf("error initializing app: %v", err)
-			os.Exit(1)
-		}
-
 		auth, err := app.Auth(context.Background())
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
