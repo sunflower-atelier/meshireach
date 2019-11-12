@@ -7,6 +7,8 @@ services:
     ports:
       - 3306:3306
     restart: always
+    networks:
+      - meshireach
     environment:
       MYSQL_DATABASE: meshireach
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -19,6 +21,8 @@ services:
       - 3000:3000
     volumes:
       - ./:/go/meshireach
+    networks:
+      - meshireach
     environment:
       GO111MODULE: "on"
       CGO_ENABLED: 0
@@ -28,9 +32,15 @@ services:
       - ./docs/docs.yaml:/usr/share/nginx/html/docs.yaml
     ports:
       - 8080:8080
+    networks:
+      - meshireach
     environment:
       API_URL: docs.yaml
 
 volumes:
   mysql_data:
     driver: "local"
+
+networks:
+  meshireach:
+    external: true
