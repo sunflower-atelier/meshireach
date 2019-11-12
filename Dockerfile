@@ -7,4 +7,3 @@ RUN apk update \
   && go get -u golang.org/x/lint/golint \
   && go mod download
 CMD ["fresh"]
-
