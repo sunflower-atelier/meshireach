@@ -45,9 +45,30 @@ jobs:
       - run:
           name: Testing ./test/some_tests
           command: go test -run 'test/'
+  deploy:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - ${FINGER_PRINT}
+      - run:
+          name: Start ssh-keyscan
+          command: ssh-keyscan ${HOST_NAME} >> ~/.ssh/known_hosts
+      - run:
+          name: deploy
+          command: sh ./deploy.sh
 
 workflows:
-  testing:
+  test_and_deploy:
     jobs:
       - setup
+      - deploy:
+          requires:
+            - setup
+          filters:
+            branches:
+              only: deploy
+
 
