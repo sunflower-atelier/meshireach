@@ -11,7 +11,6 @@ import (
 	"time"
 
 	firebase "firebase.google.com/go"
-	"firebase.google.com/go/messaging"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -56,9 +55,6 @@ func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 	// 生存確認用
 	r.GET("/ping", api.Ping())
 
-	// 通知テスト用
-	r.GET("/messaging", testMessaging(fapp))
-
 	authedGroup := r.Group("/")
 	authedGroup.Use(middleware.FirebaseAuth(fapp))
 	{
@@ -86,55 +82,13 @@ func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 
 		// device
 		authedGroup.POST("/device/token", api.RegisterDeviceToken(db))
-    
+
 		// joining-list
 		authedGroup.GET("/events-joining-list", api.GetAllJoinEvents(db))
 
 	}
 
 	return r
-}
-
-func testMessaging(app *firebase.App) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Obtain a messaging.Client from the App.
-		netctx := context.Background()
-		client, err := app.Messaging(netctx)
-		if err != nil {
-			s := fmt.Sprintf("error getting Messaging client: %v\n", err)
-			fmt.Print(s)
-			c.String(http.StatusOK, s)
-			c.Abort()
-			return
-		}
-
-		// This registration token comes from the client FCM SDKs.
-		registrationToken := c.Query("token")
-		fmt.Printf("[testMessaging] get token: %v", registrationToken)
-
-		// See documentation on defining a message payload.
-		message := &messaging.Message{
-			Notification: &messaging.Notification{
-				Title: "TESTテストtest",
-				Body:  "HOGEほげhoge",
-			},
-			Token: registrationToken,
-		}
-
-		// Send a message to the device corresponding to the provided
-		// registration token.
-		response, err := client.Send(netctx, message)
-		if err != nil {
-			s := fmt.Sprintf("error response Messaging client: %v\n", err)
-			fmt.Print(s)
-			c.String(http.StatusOK, s)
-			c.Abort()
-			return
-		}
-
-		// Response is a message ID string.
-		c.String(http.StatusOK, fmt.Sprintf("Successfully sent message:%v\n", response))
-	}
 }
 
 func main() {
