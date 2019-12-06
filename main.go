@@ -30,7 +30,7 @@ func initDB() *gorm.DB {
 	godotenv.Load()
 	user := os.Getenv("MYSQL_USER")
 	pass := os.Getenv("MYSQL_PASSWORD")
-	db, err := gorm.Open("mysql", user + ":" + pass + "@tcp(db:3306)/meshireach?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", user+":"+pass+"@tcp(db:3306)/meshireach?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic("failed to connect database")
 	}
