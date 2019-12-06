@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: mysql:8.0.16
+    image: mysql:8.0.18
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -11,7 +11,10 @@ services:
       - meshireach
     environment:
       MYSQL_DATABASE: meshireach
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: localhost
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
     command: mysqld
   api:
     build: .
