@@ -43,6 +43,21 @@ func RegisterDeviceToken(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// DeleteAllDeviceTokens オーナーに紐づいた全てのデバイスIDを消す
+func DeleteAllDeviceTokens(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ownerFirebaseID := c.MustGet("FirebaseID").(string)
+		user := model.User{}
+		db.Where("firebase_id = ? ", ownerFirebaseID).First(&user)
+
+		db.Delete(model.Device{}, "device_owner = ?", user.ID)
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "success",
+		})
+	}
+}
+
 // SendNotify 与えられたオーナーに紐づいたデバイス全てに通知を送る
 func SendNotification(fapp *firebase.App, db *gorm.DB, owners []uint, title string, body string, data *map[string]string) error {
 	netctx := context.Background()

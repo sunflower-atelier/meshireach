@@ -82,6 +82,7 @@ func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 
 		// device
 		authedGroup.POST("/device/token", api.RegisterDeviceToken(db))
+		authedGroup.DELETE("/device/tokens", api.DeleteAllDeviceTokens(db))
 
 		// joining-list
 		authedGroup.GET("/events-joining-list", api.GetAllJoinEvents(db))
