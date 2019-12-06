@@ -87,6 +87,7 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 		beforeUser := model.User{FirebaseID: firebaseID.(string)}
 		db.First(&beforeUser)
 
+		// 既にSearchIDがあるか確認
 		if (beforeUser.SearchID != user.SearchID) && existSearchID(db, user.SearchID) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
