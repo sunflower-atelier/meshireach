@@ -82,18 +82,18 @@ func EditProfile(db *gorm.DB) gin.HandlerFunc {
 		user := model.User{}
 		c.BindJSON(&user)
 
-		if existSearchID(db, user.SearchID) {
+		// 更新前の情報を取得
+		firebaseID := c.MustGet("FirebaseID")
+		beforeUser := model.User{FirebaseID: firebaseID.(string)}
+		db.First(&beforeUser)
+
+		if (beforeUser.SearchID != user.SearchID) && existSearchID(db, user.SearchID) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "failure",
 				"error":  "Search ID is not unique.",
 			})
 			return
 		}
-
-		// 更新前の情報を取得
-		firebaseID := c.MustGet("FirebaseID")
-		beforeUser := model.User{FirebaseID: firebaseID.(string)}
-		db.First(&beforeUser)
 
 		// 更新
 		db.Model(&beforeUser).Updates(user)
