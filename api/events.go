@@ -13,7 +13,7 @@ import (
 )
 
 // JoinEvents イベントへの参加
-func JoinEvents(db *gorm.DB) gin.HandlerFunc {
+func JoinEvents(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idstring := c.Param("id")
 		idInt, _ := strconv.Atoi(idstring)
@@ -64,6 +64,15 @@ func JoinEvents(db *gorm.DB) gin.HandlerFunc {
 
 		// ユーザをイベントに登録
 		db.Model(&event).Association("Users").Append(&user)
+
+		// イベントオーナーに通知
+		title := fmt.Sprintf("%sさんがメシに参加！", user.Name)
+		_, month, day := event.Deadline.Date()
+		hour, min, _ := event.Deadline.Clock()
+		contents := fmt.Sprintf("%s [%02d/%02d-%02d:%02d~]",
+			event.Title,
+			month, day, hour, min)
+		SendNotification(fapp, db, []uint{event.Owner}, title, contents, &map[string]string{})
 
 		// 必要な情報を返す
 		c.JSON(http.StatusCreated, gin.H{
@@ -172,7 +181,7 @@ func RegisterEvent(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 			friendIDs[idx] = f.ID
 		}
 		title := fmt.Sprintf("%sさんがメシ仲間を募集中！", owner.Name)
-		contents := fmt.Sprintf("%s [%d/%d-%d:%d~]",
+		contents := fmt.Sprintf("%s [%02d/%02d-%02d:%02d~]",
 			event.Title,
 			month, day, hour, min)
 		SendNotification(fapp, db, friendIDs, title, contents, &map[string]string{})

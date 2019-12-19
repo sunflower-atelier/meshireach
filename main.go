@@ -76,7 +76,7 @@ func initRoute(db *gorm.DB, fapp *firebase.App) *gin.Engine {
 		authedGroup.GET("/friends", api.GetAllFriends(db))
 
 		// events
-		authedGroup.POST("/events/:id/join", api.JoinEvents(db))
+		authedGroup.POST("/events/:id/join", api.JoinEvents(fapp, db))
 		authedGroup.GET("/events/:id/participants", api.GetAllParticipants(db))
 		authedGroup.POST("/events", api.RegisterEvent(fapp, db))
 		authedGroup.GET("/events", api.GetMyEvents(db))
