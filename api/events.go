@@ -69,7 +69,7 @@ func JoinEvents(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 		title := fmt.Sprintf("%sさんがメシに参加！", user.Name)
 		_, month, day := event.Deadline.Date()
 		hour, min, _ := event.Deadline.Clock()
-		contents := fmt.Sprintf("%s [%d/%d-%d:%d~]",
+		contents := fmt.Sprintf("%s [%02d/%02d-%02d:%02d~]",
 			event.Title,
 			month, day, hour, min)
 		SendNotification(fapp, db, []uint{event.Owner}, title, contents, &map[string]string{})
@@ -181,7 +181,7 @@ func RegisterEvent(fapp *firebase.App, db *gorm.DB) gin.HandlerFunc {
 			friendIDs[idx] = f.ID
 		}
 		title := fmt.Sprintf("%sさんがメシ仲間を募集中！", owner.Name)
-		contents := fmt.Sprintf("%s [%d/%d-%d:%d~]",
+		contents := fmt.Sprintf("%s [%02d/%02d-%02d:%02d~]",
 			event.Title,
 			month, day, hour, min)
 		SendNotification(fapp, db, friendIDs, title, contents, &map[string]string{})
